@@ -5,7 +5,7 @@ on:
     types: [opened, ready_for_review, reopened, synchronize]
 
 jobs:
-  lint-test:
+  pre-merge-checks:
     runs-on: ubuntu-latest
     steps:
       - name: Install NodeJS
@@ -26,4 +26,4 @@ jobs:
         run: npx eslint .
 
       - name: Unit Tests
-        run: npx jest
+        run: npm test
