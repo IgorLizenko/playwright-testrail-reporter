@@ -1,6 +1,6 @@
 {
   "name": "playwright-reporter-testrail",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Playwright reporter for TestRail with multi project support",
   "homepage": "https://github.com/IgorLizenko/playwright-testrail-reporter#readme",
   "bugs": {
