@@ -9,7 +9,8 @@
       "@reporter/*": ["src/reporter/*"],
       "@utils/*": ["src/utils/*"],
       "@logger": ["src/utils/logger.ts"],
-      "@utils/logger": ["@logger"]
+      "@utils/logger": ["@logger"],
+      "@test-data": ["test-playwright/test-data.ts"]
     },
     "outDir": "./lib",
     "esModuleInterop": true,

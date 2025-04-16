@@ -113,6 +113,11 @@ export default [
                 position: 'before'
               },
               {
+                pattern: '@test-data/**',
+                group: 'internal',
+                position: 'before'
+              },
+              {
                 pattern: '@(logger|toolbox)/**',
                 group: 'internal',
                 position: 'before'

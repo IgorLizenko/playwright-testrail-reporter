@@ -13,7 +13,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-    testDir: '.',
+    testDir: './tests',
     testMatch: '*.spec.ts',
     reporter: [
         ['html', { open: 'never' }],
