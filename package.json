@@ -1,6 +1,6 @@
 {
   "name": "playwright-reporter-testrail",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Playwright reporter for TestRail with multi project support",
   "homepage": "https://github.com/IgorLizenko/playwright-testrail-reporter#readme",
   "bugs": {
@@ -25,6 +25,7 @@
   "dependencies": {
     "axios": "^1.8.4",
     "axios-retry": "^4.5.0",
+    "chalk": "^4.1.2",
     "winston": "^3.17.0"
   },
   "devDependencies": {
