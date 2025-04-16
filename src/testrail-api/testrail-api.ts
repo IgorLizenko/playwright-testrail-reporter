@@ -135,10 +135,7 @@ class TestRail {
             })
             .catch((error: unknown) => {
                 const errorPayload = (error as AxiosError).response?.data ?? error;
-
                 logger.error(`Failed to close test run for run ID ${runId}`, errorPayload);
-
-                return null;
             });
     }
 }
