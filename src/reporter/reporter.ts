@@ -4,7 +4,7 @@ import type {
 
 import { TestRail } from '@testrail-api/testrail-api';
 
-import { groupTestResults } from '@reporter/utils/group-runs';
+import { filterDuplicatingCases, groupTestResults } from '@reporter/utils/group-runs';
 import { parseTestTags } from '@reporter/utils/tags';
 import { convertTestResult } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
@@ -81,7 +81,9 @@ class TestRailReporter implements Reporter {
             };
         });
 
-        const finalResults = groupTestResults(this.arrayTestResults, arrayTestRuns);
+        const finalResults = groupTestResults(this.arrayTestResults, arrayTestRuns).map((finalResult) => {
+            return filterDuplicatingCases(finalResult);
+        });
         logger.debug('Test runs to update', finalResults);
 
         if (finalResults.length === 0) {
