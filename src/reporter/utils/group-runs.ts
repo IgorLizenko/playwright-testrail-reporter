@@ -2,6 +2,8 @@ import type { FinalResult, RunCreated } from '@types-internal/playwright-reporte
 import type { TestRailCaseResult } from '@types-internal/testrail-api.types';
 import { TestRailCaseStatus } from '@types-internal/testrail-api.types';
 
+import logger from '@logger';
+
 /**
  * Groups test results by test runs based on case IDs.
  * @param runsCreated Array of runs with their case IDs
@@ -54,6 +56,7 @@ function filterDuplicatingCases(singleResult: FinalResult): FinalResult {
         if (caseResults.length === 1) {
             filteredResults.push(caseResults[0]);
         } else {
+            logger.warn('Multiple results found for case ID:', caseResults[0].case_id);
             const sortedResults = caseResults.sort(compareByStatusPriority);
             filteredResults.push(sortedResults[0]);
         }

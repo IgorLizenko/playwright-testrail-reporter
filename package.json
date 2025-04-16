@@ -20,6 +20,9 @@
     "test": "JEST_TEST=true npx jest",
     "playwright-all": "DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts",
     "playwright-no-tags": "DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/invalid.tags.spec.ts",
+    "playwright-basic": "DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/basic.tags.spec.ts",
+    "playwright-multiresult": "DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/multiresult.spec.ts",
+    "playwright-multisuite": "DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/multisuite.spec.ts",
     "prepare": "husky"
   },
   "dependencies": {
