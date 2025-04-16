@@ -29,12 +29,8 @@ const logFormat = winston.format.printf(({ level, message, timestamp, ...metadat
     return formattedMessage;
 });
 
-let level = 'info';
-if (process.env.JEST_TEST === 'true') { level = 'silent'; };
-if (process.env.DEBUG_MODE === 'true') { level = 'debug'; };
-
 const logger = winston.createLogger({
-    level,
+    level: process.env.DEBUG_MODE === 'true' ? 'debug' : 'info',
     format: winston.format.combine(
         winston.format.colorize({ level: true }),
         winston.format.timestamp({ format: 'HH:mm:ss' }),

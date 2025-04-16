@@ -93,6 +93,7 @@ const config: Config = {
     moduleNameMapper: {
         '^@reporter/(.*)$': '<rootDir>/src/reporter/$1',
         '^@types-internal/(.*)$': '<rootDir>/src/types/$1',
+        '^@testrail-api/(.*)$': '<rootDir>/src/testrail-api/$1',
         '^@logger': '<rootDir>/src/utils/logger'
     },
 

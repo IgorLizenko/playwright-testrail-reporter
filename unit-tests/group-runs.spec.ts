@@ -3,27 +3,103 @@ import { filterDuplicatingCases, groupTestResults } from '@reporter/utils/group-
 import { FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseResult, TestRailCaseStatus } from '@types-internal/testrail-api.types';
 
-describe('Group runs unit tests', function () {
-    describe('Basic run grouping', function () {
-        it('Should handle empty runs and results', function () {
+import logger from '@logger';
+
+jest.mock('@logger', () => ({
+    error: jest.fn(),
+    warn: jest.fn()
+}));
+
+describe('Group runs unit tests', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('Group test results', () => {
+        it('Should group single run and single test result', () => {
+            const arrayTestResults: TestRailCaseResult[] = [
+                { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' }
+            ];
+
+            const arrayTestRuns: RunCreated[] = [
+                { projectId: 10, suiteId: 100, runId: 1000, arrayCaseIds: [1] }
+            ];
+
+            expect(groupTestResults(arrayTestResults, arrayTestRuns)).toEqual([
+                {
+                    runId: 1000,
+                    arrayCaseResults: [
+                        { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' }
+                    ]
+                }
+            ]);
+        });
+
+        it('Should log an error when no runs are provided', () => {
+            const arrayTestResults: TestRailCaseResult[] = [];
+            const arrayTestRuns: RunCreated[] = [];
+
+            groupTestResults(arrayTestResults, arrayTestRuns);
+
+            expect(logger.error).toHaveBeenCalledWith('No test runs provided');
+        });
+
+        it('Should return empty array when no runs are provided', () => {
             const arrayTestResults: TestRailCaseResult[] = [];
             const arrayTestRuns: RunCreated[] = [];
 
             expect(groupTestResults(arrayTestResults, arrayTestRuns)).toEqual([]);
         });
 
-        it('Should group test results by runs correctly', function () {
+        it('Should log an error when no matching cases are found for a run', () => {
+            const arrayTestResults: TestRailCaseResult[] = [
+                { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' }
+            ];
+
+            const arrayTestRuns: RunCreated[] = [
+                { projectId: 10, suiteId: 100, runId: 1000, arrayCaseIds: [2] }
+            ];
+
+            groupTestResults(arrayTestResults, arrayTestRuns);
+
+            expect(logger.error).toHaveBeenCalledWith('No matching cases found for run ID: 1000');
+        });
+
+        it('Should group multiple test case with the same run', () => {
+            const arrayTestResults: TestRailCaseResult[] = [
+                { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
+                { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' }
+            ];
+
+            const arrayTestRuns: RunCreated[] = [
+                { projectId: 10, suiteId: 100, runId: 1000, arrayCaseIds: [1, 2] }
+            ];
+
+            expect(groupTestResults(arrayTestResults, arrayTestRuns)).toEqual([
+                {
+                    runId: 1000,
+                    arrayCaseResults: [
+                        { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
+                        { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' }
+                    ]
+                }
+            ]);
+        });
+
+        it('Should group multiple test cases with multiple runs', () => {
             const arrayTestResults: TestRailCaseResult[] = [
                 { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
                 { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' },
-                { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3' },
-                { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4' }
+                { case_id: 3, status_id: TestRailCaseStatus.passed, comment: 'Test 3' },
+                { case_id: 4, status_id: TestRailCaseStatus.blocked, comment: 'Test 4' },
+                { case_id: 5, status_id: TestRailCaseStatus.untested, comment: 'Test 5' },
+                { case_id: 6, status_id: TestRailCaseStatus.untested, comment: 'Test 6' }
             ];
 
             const arrayTestRuns: RunCreated[] = [
                 { projectId: 10, suiteId: 100, runId: 1000, arrayCaseIds: [1, 2] },
-                { projectId: 20, suiteId: 200, runId: 2000, arrayCaseIds: [2, 3, 4] },
-                { projectId: 30, suiteId: 300, runId: 3000, arrayCaseIds: [3, 4] }
+                { projectId: 10, suiteId: 101, runId: 1001, arrayCaseIds: [3] },
+                { projectId: 10, suiteId: 102, runId: 1002, arrayCaseIds: [4, 5, 6] }
             ];
 
             expect(groupTestResults(arrayTestResults, arrayTestRuns)).toEqual([
@@ -35,112 +111,94 @@ describe('Group runs unit tests', function () {
                     ]
                 },
                 {
-                    runId: 2000,
+                    runId: 1001,
                     arrayCaseResults: [
-                        { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' },
-                        { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3' },
-                        { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4' }
+                        { case_id: 3, status_id: TestRailCaseStatus.passed, comment: 'Test 3' }
                     ]
                 },
                 {
-                    runId: 3000,
+                    runId: 1002,
                     arrayCaseResults: [
-                        { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3' },
-                        { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4' }
+                        { case_id: 4, status_id: TestRailCaseStatus.blocked, comment: 'Test 4' },
+                        { case_id: 5, status_id: TestRailCaseStatus.untested, comment: 'Test 5' },
+                        { case_id: 6, status_id: TestRailCaseStatus.untested, comment: 'Test 6' }
                     ]
                 }
             ]);
         });
-
-        it('Should handle runs with no matching results', function () {
-            const arrayTestResults: TestRailCaseResult[] = [
-                { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' }
-            ];
-
-            const arrayTestRuns: RunCreated[] = [
-                { projectId: 10, suiteId: 100, runId: 1000, arrayCaseIds: [2] }
-            ];
-
-            expect(groupTestResults(arrayTestResults, arrayTestRuns)).toEqual([
-                {
-                    runId: 1000,
-                    arrayCaseResults: []
-                }
-            ]);
-        });
-
-        it('Should handle results with no matching runs', function () {
-            const arrayTestResults: TestRailCaseResult[] = [
-                { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' }
-            ];
-
-            const arrayTestRuns: RunCreated[] = [];
-
-            expect(groupTestResults(arrayTestResults, arrayTestRuns)).toEqual([]);
-        });
     });
 
-    describe('Filtering duplicating cases', function () {
-        it('Should not change anything if result has no duplicating cases', function () {
+    describe('Filter duplicating cases', () => {
+        it('Should not change anything if result has no duplicating cases', () => {
             const finalResult: FinalResult = {
                 runId: 1000,
                 arrayCaseResults: [
                     { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
                     { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' },
-                    { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3' },
-                    { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4' },
-                    { case_id: 5, status_id: TestRailCaseStatus.passed, comment: 'Test 5' }
+                    { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3' }
                 ]
             };
 
             expect(filterDuplicatingCases(finalResult)).toEqual(finalResult);
         });
 
-        it('Should leave just the first case result for multiple cases with the same status', function () {
+        it('Should call logger.warn when multiple cases are found for the same case ID', () => {
             const finalResult: FinalResult = {
                 runId: 1000,
                 arrayCaseResults: [
-                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 Passed 0' },
-                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 Passed 1' },
-                    { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2 Failed 0' },
-                    { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2 Failed 1' },
-                    { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2 Failed 2' },
-                    { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3 Blocked 0' },
-                    { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3 Blocked 1' },
-                    { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3 Blocked 2' },
-                    { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4 Untested 0' },
-                    { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4 Untested 1' },
-                    { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4 Untested 2' }
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Duplicate' },
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Another Duplicate' }
+                ]
+            };
+
+            filterDuplicatingCases(finalResult);
+
+            expect(logger.warn).toHaveBeenCalledWith('Multiple results found for case ID:', 1);
+        });
+
+        it('Should leave just the first case result for multiple cases with the same status', () => {
+            const finalResult: FinalResult = {
+                runId: 1000,
+                arrayCaseResults: [
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Duplicate' },
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Another Duplicate' }
                 ]
             };
 
             expect(filterDuplicatingCases(finalResult)).toEqual({
                 runId: 1000,
                 arrayCaseResults: [
-                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 Passed 0' },
-                    { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2 Failed 0' },
-                    { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3 Blocked 0' },
-                    { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4 Untested 0' }
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' }
                 ]
             });
         });
 
-        it('Should filter out cases based on status priority', function () {
+        it('Should filter out cases based on status priority', () => {
             const finalResult: FinalResult = {
                 runId: 1000,
                 arrayCaseResults: [
-                    { case_id: 1, status_id: TestRailCaseStatus.failed, comment: 'Test 1 Failed' },
-                    { case_id: 1, status_id: TestRailCaseStatus.blocked, comment: 'Test 1 Blocked' },
-                    { case_id: 1, status_id: TestRailCaseStatus.untested, comment: 'Test 1 Untested' }
+                    { case_id: 1, status_id: TestRailCaseStatus.failed, comment: 'Test 1 - Failed' },
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Passed' },
+                    { case_id: 2, status_id: TestRailCaseStatus.blocked, comment: 'Test 2 - Blocked' },
+                    { case_id: 2, status_id: TestRailCaseStatus.untested, comment: 'Test 2 - Untested' },
+                    { case_id: 3, status_id: TestRailCaseStatus.untested, comment: 'Test 3 - Untested' },
+                    { case_id: 3, status_id: TestRailCaseStatus.failed, comment: 'Test 3 - Failed' },
+                    { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3 - Blocked' }
                 ]
             };
 
             expect(filterDuplicatingCases(finalResult)).toEqual({
                 runId: 1000,
                 arrayCaseResults: [
-                    { case_id: 1, status_id: TestRailCaseStatus.failed, comment: 'Test 1 Failed' }
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Passed' },
+                    { case_id: 2, status_id: TestRailCaseStatus.blocked, comment: 'Test 2 - Blocked' },
+                    { case_id: 3, status_id: TestRailCaseStatus.failed, comment: 'Test 3 - Failed' }
                 ]
             });
+
+            expect(logger.warn).toHaveBeenCalledWith('Multiple results found for case ID:', 1);
         });
     });
 });

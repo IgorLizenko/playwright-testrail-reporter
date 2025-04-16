@@ -2,13 +2,35 @@ import { validateSettings } from '@reporter/utils/validate-settings';
 
 import { ReporterOptions } from '@types-internal/playwright-reporter.types';
 
+import logger from '@logger';
+
+jest.mock('@logger', () => ({
+    error: jest.fn(),
+    warn: jest.fn()
+}));
+
 describe('Validate settings tests', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
     it('Should return true if settings are set', () => {
         expect(validateSettings({
             domain: 'https://testrail.com',
             username: 'username',
             password: 'password'
         })).toBe(true);
+    });
+
+    it('Should not log an error if settings are set', () => {
+        validateSettings({
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password'
+        });
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.warn).not.toHaveBeenCalled();
     });
 
     it('Should return false if domain is not set', () => {
@@ -34,6 +56,14 @@ describe('Validate settings tests', () => {
 
     it('Should return false if all fields are missing', () => {
         expect(validateSettings({} as ReporterOptions)).toBe(false);
+    });
+
+    it('Should log an error any settings are missing', () => {
+        validateSettings({
+            username: 'username'
+        } as ReporterOptions);
+
+        expect(logger.error).toHaveBeenCalledWith('Missing required credentials: domain, password');
     });
 
     it('Should return false if fields have incorrect types', () => {

@@ -10,10 +10,18 @@ import logger from '@logger';
  * @returns Array of final results grouped by runs
  */
 function groupTestResults(arrayTestResults: TestRailCaseResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
+    if (arrayTestRuns.length === 0) {
+        logger.error('No test runs provided');
+    }
+
     return arrayTestRuns.map((run) => {
         const arrayCaseResults = arrayTestResults.filter((result) => {
             return run.arrayCaseIds.includes(result.case_id);
         });
+
+        if (arrayCaseResults.length === 0) {
+            logger.error(`No matching cases found for run ID: ${run.runId}`);
+        }
 
         return {
             runId: run.runId,
@@ -24,7 +32,7 @@ function groupTestResults(arrayTestResults: TestRailCaseResult[], arrayTestRuns:
 
 /**
  * Compares two test case results by their status priority
- * Priority order: passed > failed > blocked > untested > retest
+ * Priority order: passed > failed > blocked > untested
  * @param a First test case result
  * @param b Second test case result
  * @returns Positive if b has higher priority, negative if a has higher priority
