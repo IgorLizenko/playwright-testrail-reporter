@@ -58,7 +58,7 @@ describe('Validate settings tests', () => {
         expect(validateSettings({} as ReporterOptions)).toBe(false);
     });
 
-    it('Should log an error any settings are missing', () => {
+    it('Should log an error if any settings are missing', () => {
         validateSettings({
             username: 'username'
         } as ReporterOptions);
