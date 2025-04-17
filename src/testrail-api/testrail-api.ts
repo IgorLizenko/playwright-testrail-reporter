@@ -65,17 +65,20 @@ class TestRail {
         projectId,
         suiteId,
         name,
-        cases
+        cases,
+        includeAllCases
     }: {
         projectId: TestRailProject['id'],
         suiteId: TestRailSuite['id'],
         name: TestRailRun['name'],
-        cases: TestRailCase['id'][]
+        cases: TestRailCase['id'][],
+        includeAllCases: boolean
     }): Promise<TestRailRunWithAdditionalData | null> {
         return this.client.post(`/api/v2/add_run/${projectId}`, {
             suite_id: suiteId,
             name,
-            case_ids: cases
+            case_ids: cases,
+            include_all: includeAllCases
         }).then((response: { data: TestRailRun }) => {
             logger.debug(`Run created with ID: ${response.data.id}`);
 

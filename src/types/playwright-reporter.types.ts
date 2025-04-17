@@ -3,7 +3,9 @@ import type { TestRailCase, TestRailCaseResult, TestRailProject, TestRailRun, Te
 export type ReporterOptions = {
     domain: string,
     username: string,
-    password: string
+    password: string,
+    closeRuns?: boolean,
+    includeAllCases?: boolean
 };
 
 export type ParsedTag = {

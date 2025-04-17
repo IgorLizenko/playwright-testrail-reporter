@@ -22,12 +22,18 @@ class TestRailReporter implements Reporter {
     private arrayTestRunPromises: Promise<TestRailRunWithAdditionalData | null>[] = [];
     private arrayTestResults: TestRailCaseResult[];
 
+    private readonly closeRuns: boolean;
+    private readonly includeAllCases: boolean;
+
     constructor(options: ReporterOptions) {
         this.isSetupCorrectly = validateSettings(options);
         logger.debug('Setting up TestRail API client');
         this.testRailClient = new TestRail(options);
 
         this.arrayTestResults = [];
+
+        this.closeRuns = options.closeRuns ?? false;
+        this.includeAllCases = options.includeAllCases ?? false;
     }
 
     onBegin?(_config: FullConfig, suite: Suite): void {
@@ -47,7 +53,8 @@ class TestRailReporter implements Reporter {
                     projectId: projectSuiteCombo.projectId,
                     suiteId: projectSuiteCombo.suiteId,
                     name,
-                    cases: projectSuiteCombo.arrayCaseIds
+                    cases: projectSuiteCombo.arrayCaseIds,
+                    includeAllCases: this.includeAllCases
                 });
             });
         } else {

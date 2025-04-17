@@ -26,7 +26,7 @@ npm install --save-dev playwright-reporter-testrail
 
 1. Get your TestRail credentials:
    - Domain (e.g., `https://yourdomain.testrail.io`)
-   - Username/Email
+   - Email
    - Password or API Key
 
 2. Configure the reporter in your `playwright.config.ts`:
@@ -38,14 +38,24 @@ const config: PlaywrightTestConfig = {
   reporter: [
     ['playwright-reporter-testrail', {
       domain: 'https://yourdomain.testrail.io',
-      username: 'your-username',
-      password: 'your-password'
+      username: 'your-email',
+      password: 'your-password',
+      includeAllCases: false,
+      closeRuns: false
     }]
   ]
 };
 
 export default config;
 ```
+
+### Options
+
+- `domain`: TestRail domain (e.g., `https://yourdomain.testrail.io`)
+- `username`: TestRail email
+- `password`: TestRail password or API key
+- `includeAllCases`: Optional, default `false`, whether to include all cases of the suite to the test run
+- `closeRuns`: Optional, default `false`, whether to close runs on end
 
 ## Usage
 
