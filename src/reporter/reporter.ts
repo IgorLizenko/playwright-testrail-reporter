@@ -47,24 +47,11 @@ class TestRailReporter implements Reporter {
     }
 
     async onEnd(result: FullResult): Promise<void> {
-        if (!this.isSetupCorrectly) {
-            logger.error('Reporter options are not valid, no test runs will be created');
+        if (!this.shouldCreateRuns(result)) {
             return;
         }
 
-        if (result.status !== 'passed' && result.status !== 'failed') {
-            logger.warn('Test run was either interrupted or timed out, no test runs will be created');
-
-            return;
-        }
-
-        if (!this.arrayTestRuns) {
-            logger.warn('No tags in expected format found');
-
-            return;
-        }
-
-        const arrayTestRunsCreated = await this.createTestRuns(this.arrayTestRuns);
+        const arrayTestRunsCreated = await this.createTestRuns(this.arrayTestRuns!);
 
         const finalResults = this.compileFinalResults(this.arrayTestResults, arrayTestRunsCreated);
         logger.debug('Test runs to update', finalResults);
@@ -86,6 +73,27 @@ class TestRailReporter implements Reporter {
             : 'All test runs have been updated ✅';
 
         logger.info(finalMessage);
+    }
+
+    private shouldCreateRuns(result: FullResult): boolean {
+        if (!this.isSetupCorrectly) {
+            logger.error('Reporter options are not valid, no test runs will be created');
+            return false;
+        }
+
+        if (result.status !== 'passed' && result.status !== 'failed') {
+            logger.warn('Test run was either interrupted or timed out, no test runs will be created');
+
+            return false;
+        }
+
+        if (!this.arrayTestRuns) {
+            logger.warn('No tags in expected format found');
+
+            return false;
+        }
+
+        return true;
     }
 
     private async createTestRuns(arrayTestRuns: ProjectSuiteCombo[]): Promise<RunCreated[]> {
