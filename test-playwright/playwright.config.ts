@@ -16,7 +16,6 @@ export default defineConfig({
     testDir: './tests',
     testMatch: '*.spec.ts',
     reporter: [
-        ['html', { open: 'never' }],
         ['../src/index.ts', {
             domain: process.env.TESTRAIL_URL,
             username: process.env.TESTRAIL_USERNAME,
