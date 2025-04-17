@@ -1,3 +1,5 @@
+import { stripVTControlCharacters } from 'util';
+
 import type { TestCase, TestResult } from '@playwright/test/reporter';
 
 import { parseSingleTestTags } from '@reporter/utils/tags';
@@ -40,7 +42,7 @@ export function convertTestStatus(status: TestResult['status']): TestRailCaseSta
  * - unknown: "Test finished with unknown status"
  */
 export function generateTestComment(testCase: TestCase, testResult: TestResult): string {
-    const errorMessage = testResult.errors[0]?.message ?? 'Unknown error';
+    const errorMessage = stripVTControlCharacters(testResult.errors[0]?.message ?? 'Unknown error');
 
     switch (testResult.status) {
         case 'passed':
