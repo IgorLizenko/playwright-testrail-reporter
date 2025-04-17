@@ -6,6 +6,19 @@ import { parseSingleTestTags } from '@reporter/utils/tags';
 
 import { TestRailCaseResult, TestRailCaseStatus } from '@types-internal/testrail-api.types';
 
+function formatMilliseconds(ms: number): string {
+    const seconds = Math.ceil(ms / 1000);
+
+    if (seconds < 60) {
+        return `${seconds}s`;
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${minutes}m ${remainingSeconds}s`;
+}
+
 /**
  * Converts a Playwright test status to the corresponding TestRail status.
  * @param status The Playwright test status ('passed', 'failed', 'timedOut', 'skipped', 'interrupted').
@@ -34,9 +47,9 @@ export function convertTestStatus(status: TestResult['status']): TestRailCaseSta
  * Generates a comment string based on the Playwright test result.
  * @param testResult The Playwright test result object.
  * @returns A descriptive comment based on the test status:
- * - passed: "Test passed in {duration}ms"
+ * - passed: "Test passed in {duration} seconds"
  * - failed: "Test failed: {error message}"
- * - timedOut: "Test timed out in {duration}ms"
+ * - timedOut: "Test timed out in {duration} seconds"
  * - interrupted: "Test interrupted"
  * - skipped: "Test skipped"
  * - unknown: "Test finished with unknown status"
@@ -44,13 +57,15 @@ export function convertTestStatus(status: TestResult['status']): TestRailCaseSta
 export function generateTestComment(testCase: TestCase, testResult: TestResult): string {
     const errorMessage = stripVTControlCharacters(testResult.errors[0]?.message ?? 'Unknown error');
 
+    const durationString = formatMilliseconds(testResult.duration);
+
     switch (testResult.status) {
         case 'passed':
-            return `${testCase.title} passed in ${testResult.duration}ms`;
+            return `${testCase.title} passed in ${durationString}`;
         case 'failed':
             return `${testCase.title} failed: ${errorMessage}`;
         case 'timedOut':
-            return `${testCase.title} timed out in ${testResult.duration}ms`;
+            return `${testCase.title} timed out in ${durationString}`;
         case 'interrupted':
             return `${testCase.title} interrupted`;
         case 'skipped':

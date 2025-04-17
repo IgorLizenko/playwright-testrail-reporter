@@ -7,7 +7,7 @@ import { TestRailCaseStatus } from '@types-internal/testrail-api.types';
 describe('Generate test result based on Playwright TestCase and TestResult', () => {
     const fullTestResult: TestResult = {
         status: 'passed' as const,
-        duration: 1234,
+        duration: 25_000,
         error: undefined,
         errors: [],
         retry: 0,
@@ -32,7 +32,7 @@ describe('Generate test result based on Playwright TestCase and TestResult', () 
             {
                 case_id: 333,
                 status_id: TestRailCaseStatus.passed,
-                comment: 'Basic test passed in 1234ms'
+                comment: 'Basic test passed in 25s'
             }
         ]);
     });

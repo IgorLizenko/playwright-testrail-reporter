@@ -35,7 +35,7 @@ describe('Test results basic unit tests', function () {
     describe('Generate test comment', function () {
         const fullTestResult: TestResult = {
             status: 'passed' as const,
-            duration: 1234,
+            duration: 650,
             error: undefined,
             errors: [],
             retry: 0,
@@ -53,13 +53,13 @@ describe('Test results basic unit tests', function () {
         } as TestCase;
 
         it('Should generate passed comment', function () {
-            const testResult = { ...fullTestResult, duration: 0 };
-            expect(generateTestComment(testCase, testResult)).toEqual('Basic test passed in 0ms');
+            const testResult = { ...fullTestResult };
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test passed in 1s');
         });
 
-        it('Should generate passed comment with a different duration', function () {
-            const testResult = { ...fullTestResult, duration: 1234 };
-            expect(generateTestComment(testCase, testResult)).toEqual('Basic test passed in 1234ms');
+        it('Should generate passed comment for a test that runs for several minutes', function () {
+            const testResult = { ...fullTestResult, duration: 360_000 };
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test passed in 6m 0s');
         });
 
         it('Should generate failed comment with unknown error', function () {
@@ -74,7 +74,7 @@ describe('Test results basic unit tests', function () {
 
         it('Should generate timed out comment', function () {
             const testResult = { ...fullTestResult, status: 'timedOut' as const };
-            expect(generateTestComment(testCase, testResult)).toEqual('Basic test timed out in 1234ms');
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test timed out in 1s');
         });
 
         it('Should generate interrupted comment', function () {
