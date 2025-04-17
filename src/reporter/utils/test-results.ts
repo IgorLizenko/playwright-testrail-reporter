@@ -1,6 +1,6 @@
 import type { TestCase, TestResult } from '@playwright/test/reporter';
 
-import { parseTestTags } from '@reporter/utils/tags';
+import { parseSingleTestTags } from '@reporter/utils/tags';
 
 import { TestRailCaseResult, TestRailCaseStatus } from '@types-internal/testrail-api.types';
 
@@ -76,7 +76,7 @@ export function convertTestResult({
     testCase: TestCase,
     testResult: TestResult
 }): TestRailCaseResult[] {
-    const parsedTags = parseTestTags(testCase.tags);
+    const parsedTags = parseSingleTestTags(testCase.tags);
 
     if (parsedTags) {
         return parsedTags.map((tag) => (

@@ -5,7 +5,7 @@ import type {
 import { TestRail } from '@testrail-api/testrail-api';
 
 import { filterDuplicatingCases, groupTestResults } from '@reporter/utils/group-runs';
-import { parseTestTags } from '@reporter/utils/tags';
+import { parseSingleTestTags } from '@reporter/utils/tags';
 import { convertTestResult } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
 
@@ -36,7 +36,7 @@ class TestRailReporter implements Reporter {
             return;
         }
 
-        const runsToCreate = parseTestTags(suite.allTests().map((test) => test.tags).flat());
+        const runsToCreate = parseSingleTestTags(suite.allTests().map((test) => test.tags).flat());
         logger.debug('Runs to create', runsToCreate);
 
         if (runsToCreate) {

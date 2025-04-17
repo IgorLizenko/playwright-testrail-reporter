@@ -1,4 +1,4 @@
-import { parseSingleTag, parseTestTags } from '@reporter/utils/tags';
+import { parseSingleTag, parseSingleTestTags } from '@reporter/utils/tags';
 
 describe('Playwright tags parsing', function () {
     describe('Single tag parsing', function () {
@@ -25,6 +25,11 @@ describe('Playwright tags parsing', function () {
             expect(parseSingleTag(tag)).toEqual(undefined);
         });
 
+        it('Should return undefined for tag of a wrong type', function () {
+            const tag = { a: 5 } as unknown as string;
+            expect(parseSingleTag(tag)).toEqual(undefined);
+        });
+
         it('Should return undefined for invalid tag', function () {
             const tag = '111-222-XX333';
             expect(parseSingleTag(tag)).toEqual(undefined);
@@ -32,9 +37,9 @@ describe('Playwright tags parsing', function () {
     });
 
     describe('Test tags parsing', function () {
-        it('Should parse array of a single tag correctly', function () {
+        it('Should parse array consisting of a single tag correctly', function () {
             const tags = ['111-222-333'];
-            expect(parseTestTags(tags)).toEqual([
+            expect(parseSingleTestTags(tags)).toEqual([
                 {
                     projectId: 111,
                     suiteId: 222,
@@ -43,9 +48,9 @@ describe('Playwright tags parsing', function () {
             ]);
         });
 
-        it('Should parse two test tags correctly', function () {
+        it('Should parse array of two tags correctly', function () {
             const tags = ['111-222-333', '111-222-444'];
-            expect(parseTestTags(tags)).toEqual([
+            expect(parseSingleTestTags(tags)).toEqual([
                 {
                     projectId: 111,
                     suiteId: 222,
@@ -54,14 +59,27 @@ describe('Playwright tags parsing', function () {
             ]);
         });
 
-        it('Should parse multiple tags from same and different projects and suites correctly', function () {
+        it('Should remove duplicates', function () {
+            const tags = ['111-222-333', '111-222-333'];
+            expect(parseSingleTestTags(tags)).toEqual([
+                {
+                    projectId: 111,
+                    suiteId: 222,
+                    arrayCaseIds: [333]
+                }
+            ]);
+        });
+
+        it('Should parse array of multiple tags from same and different projects and suites correctly', function () {
             const tags = [
                 '111-222-C111', '111-222-333', '111-222-4444', '111-222-invalid',
                 'invalid',
                 '111-333-111', '111-333-444',
-                '222-444-555', '222-444-666'
+                '222-444-555', '222-444-666',
+                '333-555-C10093', '333-555-C10094', '333-555-10093',
+                '333-666-777'
             ];
-            expect(parseTestTags(tags)).toEqual([
+            expect(parseSingleTestTags(tags)).toEqual([
                 {
                     projectId: 111,
                     suiteId: 222,
@@ -76,12 +94,22 @@ describe('Playwright tags parsing', function () {
                     projectId: 222,
                     suiteId: 444,
                     arrayCaseIds: [555, 666]
+                },
+                {
+                    projectId: 333,
+                    suiteId: 555,
+                    arrayCaseIds: [10093, 10094]
+                },
+                {
+                    projectId: 333,
+                    suiteId: 666,
+                    arrayCaseIds: [777]
                 }
             ]);
         });
 
         it('Should return undefined for empty array', function () {
-            expect(parseTestTags([])).toEqual(undefined);
+            expect(parseSingleTestTags([])).toEqual(undefined);
         });
     });
 });
