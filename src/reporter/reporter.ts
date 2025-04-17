@@ -92,7 +92,7 @@ class TestRailReporter implements Reporter {
         }
 
         if (!this.arrayTestRuns) {
-            logger.warn('No test runs to create due to absense of tags in expected format');
+            logger.warn('No test runs to create due to absence of tags in expected format');
 
             return false;
         }
