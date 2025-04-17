@@ -49,7 +49,7 @@ const config: PlaywrightTestConfig = {
 export default config;
 ```
 
-### Options
+#### Options
 
 - `domain`: TestRail domain (e.g., `https://yourdomain.testrail.io`)
 - `username`: TestRail email
