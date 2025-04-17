@@ -39,6 +39,10 @@ class TestRailReporter implements Reporter {
     onBegin?(_config: FullConfig, suite: Suite): void {
         this.arrayTestRuns = parseSingleTestTags(suite.allTests().map((test) => test.tags).flat());
         logger.debug('Runs to create', this.arrayTestRuns);
+
+        if (!this.arrayTestRuns) {
+            logger.warn('No tags in expected format found, no test runs will be created');
+        }
     }
 
     onTestEnd(testCase: TestCase, testResult: TestResult): void {
@@ -88,7 +92,7 @@ class TestRailReporter implements Reporter {
         }
 
         if (!this.arrayTestRuns) {
-            logger.warn('No tags in expected format found');
+            logger.warn('No test runs to create due to absense of tags in expected format');
 
             return false;
         }
