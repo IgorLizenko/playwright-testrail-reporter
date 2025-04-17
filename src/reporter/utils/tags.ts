@@ -29,9 +29,9 @@ export function parseSingleTag(tag: TestCase['tags'][number]): ParsedTag | undef
 }
 
 /**
- * Parses an array of TestRail tags and groups them by project and suite
+ * Parses an array of TestRail tags and groups them by project and suite. Handles duplicate case IDs by including them only once.
  * @param tags - An array of tag strings from Playwright test case tags
- * @returns An array of ProjectSuiteCombo objects, each containing projectId, suiteId, and an array of caseIds
+ * @returns An array of ProjectSuiteCombo objects, each containing projectId, suiteId, and an array of unique caseIds
  *          if at least one tag matches the expected format, undefined otherwise
  */
 export function parseSingleTestTags(tags: TestCase['tags']): ProjectSuiteCombo[] | undefined {

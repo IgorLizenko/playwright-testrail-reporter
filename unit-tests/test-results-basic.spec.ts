@@ -91,7 +91,7 @@ describe('Test results basic unit tests', function () {
             // Using a type assertion to test the default case while maintaining type safety
             const testResult = { ...fullTestResult, status: 'failed' as TestResult['status'] | 'unknown' };
             testResult.status = 'unknown';
-            expect(generateTestComment(testCase, testResult as TestResult)).toEqual('Basic test status unknown');
+            expect(generateTestComment(testCase, testResult as TestResult)).toEqual('Basic test finished with unknown status');
         });
     });
 });

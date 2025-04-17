@@ -37,7 +37,7 @@ export function convertTestStatus(status: TestResult['status']): TestRailCaseSta
  * - timedOut: "Test timed out in {duration}ms"
  * - interrupted: "Test interrupted"
  * - skipped: "Test skipped"
- * - unknown: "Test status unknown"
+ * - unknown: "Test finished with unknown status"
  */
 export function generateTestComment(testCase: TestCase, testResult: TestResult): string {
     const errorMessage = testResult.errors[0]?.message ?? 'Unknown error';
@@ -54,7 +54,7 @@ export function generateTestComment(testCase: TestCase, testResult: TestResult):
         case 'skipped':
             return `${testCase.title} skipped`;
         default:
-            return `${testCase.title} status unknown`;
+            return `${testCase.title} finished with unknown status`;
     }
 }
 

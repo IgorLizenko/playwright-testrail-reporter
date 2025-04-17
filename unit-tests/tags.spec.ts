@@ -59,7 +59,7 @@ describe('Playwright tags parsing', function () {
             ]);
         });
 
-        it('Should remove duplicates', function () {
+        it('Should handle duplicates', function () {
             const tags = ['111-222-333', '111-222-333'];
             expect(parseSingleTestTags(tags)).toEqual([
                 {
@@ -70,7 +70,7 @@ describe('Playwright tags parsing', function () {
             ]);
         });
 
-        it('Should parse array of multiple tags from same and different projects and suites correctly', function () {
+        it('Should parse array of multiple tags (including invalid and duplicates) from same and different projects and suites correctly', function () {
             const tags = [
                 '111-222-C111', '111-222-333', '111-222-4444', '111-222-invalid',
                 'invalid',
@@ -108,7 +108,7 @@ describe('Playwright tags parsing', function () {
             ]);
         });
 
-        it('Should return undefined for empty array', function () {
+        it('Should return undefined for an empty array', function () {
             expect(parseSingleTestTags([])).toEqual(undefined);
         });
     });
