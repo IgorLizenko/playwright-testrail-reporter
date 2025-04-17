@@ -96,6 +96,10 @@ Your test results will be automatically sent to TestRail.
 
 ## Additional information
 
+### Creating and Updating Test Runs
+
+TestRail test runs are created after all tests finish their execution. If Playwright run results in a timeout or interrupted statuses, test runs are not created.
+
 ### API Retry Logic
 
 The reporter will retry the API calls up to 3 times if the API call fails with a 5xx status code.
@@ -106,10 +110,6 @@ If you have multiple Playwright tests that match the same TestRail case, the rep
 
 1. If all Playwright tests finish with the same status, the TestRail case will be marked with that status, and the comment (and error in case of fail) will be generated from the first test that finished.
 2. If any Playwright tests finish with different statuses, the reporter will prioritize the following statuses in order: passed, failed, blocked, untested.
-
-### Test Run Closing
-
-When a test run is interrupted or timed out, the reporter will automatically close the test run in TestRail.
 
 ## Contributing
 
