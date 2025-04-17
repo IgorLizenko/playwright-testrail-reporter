@@ -49,13 +49,6 @@ export type TestRailRun = {
     url: string
 };
 
-// Extended type that contains request payload
-export type TestRailRunWithAdditionalData = TestRailRun & {
-    projectId: TestRailProject['id'],
-    suiteId: TestRailSuite['id'],
-    cases: TestRailCase['id'][]
-};
-
 // Payload required for updating test runs
 export type TestRailCaseResult = {
     case_id: TestRailCase['id'],

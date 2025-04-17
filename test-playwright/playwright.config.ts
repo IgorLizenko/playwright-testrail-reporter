@@ -20,7 +20,8 @@ export default defineConfig({
             domain: process.env.TESTRAIL_URL,
             username: process.env.TESTRAIL_USERNAME,
             password: process.env.TESTRAIL_PASSWORD,
-            includeAllCases: false
+            includeAllCases: false,
+            closeRuns: true
         }]
     ],
     use: {

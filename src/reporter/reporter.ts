@@ -9,8 +9,8 @@ import { parseSingleTestTags } from '@reporter/utils/tags';
 import { convertTestResult } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
 
-import { ReporterOptions } from '@types-internal/playwright-reporter.types';
-import type { TestRailCaseResult, TestRailRunWithAdditionalData } from '@types-internal/testrail-api.types';
+import type { ProjectSuiteCombo, ReporterOptions } from '@types-internal/playwright-reporter.types';
+import type { TestRailCaseResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -19,7 +19,7 @@ class TestRailReporter implements Reporter {
 
     private readonly isSetupCorrectly: boolean = false;
 
-    private arrayTestRunPromises: Promise<TestRailRunWithAdditionalData | null>[] = [];
+    private arrayTestRuns: ProjectSuiteCombo[] | undefined;
     private arrayTestResults: TestRailCaseResult[];
 
     private readonly closeRuns: boolean;
@@ -37,62 +37,60 @@ class TestRailReporter implements Reporter {
     }
 
     onBegin?(_config: FullConfig, suite: Suite): void {
-        if (!this.isSetupCorrectly) {
-            logger.error('Reporter options are not valid, skipping creating test runs');
-            return;
-        }
-
-        const runsToCreate = parseSingleTestTags(suite.allTests().map((test) => test.tags).flat());
-        logger.debug('Runs to create', runsToCreate);
-
-        if (runsToCreate) {
-            this.arrayTestRunPromises = runsToCreate.map((projectSuiteCombo) => {
-                logger.info(`Creating a test run for project ${projectSuiteCombo.projectId} and suite ${projectSuiteCombo.suiteId}...`);
-                const name = `Playwright Run ${new Date().toUTCString()}`;
-                return this.testRailClient.addTestRun({
-                    projectId: projectSuiteCombo.projectId,
-                    suiteId: projectSuiteCombo.suiteId,
-                    name,
-                    cases: projectSuiteCombo.arrayCaseIds,
-                    includeAllCases: this.includeAllCases
-                });
-            });
-        } else {
-            logger.warn('No tags in expected format found');
-        }
+        this.arrayTestRuns = parseSingleTestTags(suite.allTests().map((test) => test.tags).flat());
+        logger.debug('Runs to create', this.arrayTestRuns);
     }
 
     onTestEnd(testCase: TestCase, testResult: TestResult): void {
-        logger.debug(`Finished test ${testCase.title}: ${testResult.status}`);
+        logger.debug(`Test "${testCase.title}" finished with ${testResult.status} status`);
         this.arrayTestResults.push(...convertTestResult({ testCase, testResult }));
     }
 
     async onEnd(result: FullResult): Promise<void> {
         if (!this.isSetupCorrectly) {
-            logger.error('Reporter options are not valid, skipping updating test runs');
+            logger.error('Reporter options are not valid, no test runs will be created');
             return;
         }
-
-        // Wait for all runs to be created
-        const runs = await Promise.all(this.arrayTestRunPromises);
-        const arrayTestRuns = runs.filter((run) => run !== null).map((validRun) => {
-            return {
-                projectId: validRun.projectId,
-                suiteId: validRun.suiteId,
-                arrayCaseIds: validRun.cases,
-                runId: validRun.id
-            };
-        });
 
         if (result.status !== 'passed' && result.status !== 'failed') {
-            logger.warn('Test run was either interrupted or timed out, closing test runs');
-            await Promise.all(arrayTestRuns.map((run) => this.testRailClient.closeTestRun(run.runId)));
-            logger.warn('All created test runs have been closed ✅');
+            logger.warn('Test run was either interrupted or timed out, no test runs will be created');
 
             return;
         }
 
-        const finalResults = groupTestResults(this.arrayTestResults, arrayTestRuns).map((finalResult) => {
+        if (!this.arrayTestRuns) {
+            logger.warn('No tags in expected format found');
+
+            return;
+        }
+
+        logger.debug('Runs to create', this.arrayTestRuns);
+
+        const arrayTestRunsCreated = [];
+
+        for (const projectSuiteCombo of this.arrayTestRuns) {
+            logger.info(`Creating a test run for project ${projectSuiteCombo.projectId} and suite ${projectSuiteCombo.suiteId}...`);
+
+            const name = `Playwright Run ${new Date().toUTCString()}`;
+            const response = await this.testRailClient.addTestRun({
+                projectId: projectSuiteCombo.projectId,
+                suiteId: projectSuiteCombo.suiteId,
+                name,
+                cases: projectSuiteCombo.arrayCaseIds,
+                includeAllCases: this.includeAllCases
+            });
+
+            if (response !== null) {
+                arrayTestRunsCreated.push({
+                    runId: response.id,
+                    ...projectSuiteCombo
+                });
+            }
+        }
+
+        logger.debug('Runs created', arrayTestRunsCreated);
+
+        const finalResults = groupTestResults(this.arrayTestResults, arrayTestRunsCreated).map((finalResult) => {
             return filterDuplicatingCases(finalResult);
         });
         logger.debug('Test runs to update', finalResults);
@@ -103,11 +101,21 @@ class TestRailReporter implements Reporter {
             return;
         }
 
-        const runIds = finalResults.map((finalResult) => finalResult.runId);
-        logger.info(`Adding results to runs ${runIds.join(', ')}`);
+        const arrayRunIds = finalResults.map((finalResult) => finalResult.runId);
+
+        logger.info(`Adding results to runs ${arrayRunIds.join(', ')}`);
         await Promise.all(finalResults.map((finalResult) => this.testRailClient.addTestRunResults(finalResult.runId, finalResult.arrayCaseResults)));
 
-        logger.info('All test runs have been updated ✅');
+        if (this.closeRuns) {
+            logger.info(`Closing runs ${arrayRunIds.join(', ')}`);
+            await Promise.all(finalResults.map((finalResult) => this.testRailClient.closeTestRun(finalResult.runId)));
+        }
+
+        const finalMessage = this.closeRuns
+            ? 'All test runs have been updated and closed ✅'
+            : 'All test runs have been updated ✅';
+
+        logger.info(finalMessage);
     }
 
     printsToStdio(): boolean {
