@@ -22,8 +22,9 @@ class TestRailReporter implements Reporter {
     private arrayTestRuns: ProjectSuiteCombo[] | undefined;
     private readonly arrayTestResults: TestRailCaseResult[];
 
-    private readonly closeRuns: boolean;
     private readonly includeAllCases: boolean;
+    private readonly includeAttachments: boolean;
+    private readonly closeRuns: boolean;
 
     constructor(options: ReporterOptions) {
         this.isSetupCorrectly = validateSettings(options);
@@ -32,8 +33,9 @@ class TestRailReporter implements Reporter {
 
         this.arrayTestResults = [];
 
-        this.closeRuns = options.closeRuns ?? false;
         this.includeAllCases = options.includeAllCases ?? false;
+        this.includeAttachments = options.includeAttachments ?? false;
+        this.closeRuns = options.closeRuns ?? false;
     }
 
     onBegin?(_config: FullConfig, suite: Suite): void {

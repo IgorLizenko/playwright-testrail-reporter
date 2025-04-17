@@ -21,6 +21,7 @@ export default defineConfig({
             username: process.env.TESTRAIL_USERNAME,
             password: process.env.TESTRAIL_PASSWORD,
             includeAllCases: false,
+            includeAttachments: true,
             closeRuns: true
         }]
     ],

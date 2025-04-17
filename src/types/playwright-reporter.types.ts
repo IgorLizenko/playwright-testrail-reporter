@@ -4,8 +4,9 @@ export type ReporterOptions = {
     domain: string,
     username: string,
     password: string,
-    closeRuns?: boolean,
-    includeAllCases?: boolean
+    includeAllCases?: boolean,
+    includeAttachments?: boolean,
+    closeRuns?: boolean
 };
 
 export type ParsedTag = {
