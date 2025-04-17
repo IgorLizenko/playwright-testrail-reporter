@@ -55,7 +55,7 @@ export default config;
 - `username`: TestRail email
 - `password`: TestRail password or API key
 - `includeAllCases`: Optional, default `false`, whether to include all cases of the suite to the test run
-- `closeRuns`: Optional, default `false`, whether to close runs on end
+- `closeRuns`: Optional, default `false`, whether to close test runs in the end
 
 ## Usage
 
