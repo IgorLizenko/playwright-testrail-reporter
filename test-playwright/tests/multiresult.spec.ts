@@ -12,7 +12,7 @@ test('Passed test with the same tag as skipped', { tag: debugProject1suite0case0
 
 test('Failed test with some tag', { tag: debugProject1suite0case1 }, async ({ page }) => {
     await page.goto('https://playwright.dev');
-    await expect(page).toHaveTitle('WRONG TITLE');
+    await expect(page).toHaveTitle('WRONG TITLE', { timeout: 1_000 });
 });
 
 test('Passed test with some tag', { tag: debugProject1suite0case1 }, async ({ page }) => {

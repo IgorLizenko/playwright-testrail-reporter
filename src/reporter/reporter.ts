@@ -4,6 +4,7 @@ import type {
 
 import { TestRail } from '@testrail-api/testrail-api';
 
+import { resolvePromisesInChunks } from '@reporter/utils/chunk-promise';
 import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 import { parseArrayOfTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
@@ -26,6 +27,8 @@ class TestRailReporter implements Reporter {
     private readonly includeAllCases: boolean;
     private readonly includeAttachments: boolean;
     private readonly closeRuns: boolean;
+
+    private readonly chunkSize: number = 2;
 
     constructor(options: ReporterOptions) {
         this.isSetupCorrectly = validateSettings(options);
@@ -198,14 +201,20 @@ class TestRailReporter implements Reporter {
 
         logger.info(`Adding attachments to results ${arrayAttachmentPayloads.map((payload) => payload.resultId).join(', ')}`);
 
-        await Promise.all(arrayAttachmentPayloads.map(async (payload) => {
-            await this.testRailClient.addAttachmentToResult(payload);
-        }));
+        await resolvePromisesInChunks({
+            arrayInputData: arrayAttachmentPayloads,
+            functionToCall: (payload) => this.testRailClient.addAttachmentToResult(payload),
+            chunkSize: this.chunkSize
+        });
     }
 
     private async closeTestRuns(arrayRunIds: number[]): Promise<void> {
         logger.info(`Closing runs ${arrayRunIds.join(', ')}`);
-        await Promise.all(arrayRunIds.map((runId) => this.testRailClient.closeTestRun(runId)));
+        await resolvePromisesInChunks({
+            arrayInputData: arrayRunIds,
+            functionToCall: (runId) => this.testRailClient.closeTestRun(runId),
+            chunkSize: this.chunkSize
+        });
     }
 
     printsToStdio(): boolean {
