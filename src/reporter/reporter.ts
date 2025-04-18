@@ -101,9 +101,13 @@ class TestRailReporter implements Reporter {
             return false;
         }
 
-        if (result.status !== 'passed' && result.status !== 'failed') {
-            logger.warn('Test run was either interrupted or timed out, no test runs will be created');
+        if (result.status === 'interrupted') {
+            logger.warn('Test run was interrupted, no test runs will be created');
+            return false;
+        }
 
+        if (result.status === 'timedout') {
+            logger.warn('Test run was timed out, no test runs will be created');
             return false;
         }
 
