@@ -119,11 +119,8 @@ class TestRailReporter implements Reporter {
     private async createTestRuns(arrayTestRuns: ProjectSuiteCombo[]): Promise<RunCreated[]> {
         logger.debug('Runs to create', arrayTestRuns);
 
-        const arrayTestRunsCreated: RunCreated[] = [];
-
-        for (const projectSuiteCombo of arrayTestRuns) {
+        const results = await Promise.all(arrayTestRuns.map(async (projectSuiteCombo) => {
             logger.info(`Creating a test run for project ${projectSuiteCombo.projectId} and suite ${projectSuiteCombo.suiteId}...`);
-
             const name = `Playwright Run ${new Date().toUTCString()}`;
             const response = await this.testRailClient.addTestRun({
                 projectId: projectSuiteCombo.projectId,
@@ -133,13 +130,17 @@ class TestRailReporter implements Reporter {
                 includeAllCases: this.includeAllCases
             });
 
-            if (response !== null) {
-                arrayTestRunsCreated.push({
-                    runId: response.id,
-                    ...projectSuiteCombo
-                });
+            if (response === null) {
+                return null;
             }
-        }
+
+            return {
+                runId: response.id,
+                ...projectSuiteCombo
+            };
+        }));
+
+        const arrayTestRunsCreated = results.filter((result) => result !== null);
 
         logger.debug('Runs created', arrayTestRunsCreated);
 
@@ -193,7 +194,6 @@ class TestRailReporter implements Reporter {
         }
 
         logger.info(`Adding attachments to results ${arrayAttachmentPayloads.map((payload) => payload.resultId).join(', ')}`);
-        return;
 
         await Promise.all(arrayAttachmentPayloads.map(async (payload) => {
             await this.testRailClient.addAttachmentToResult(payload);

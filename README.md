@@ -11,8 +11,8 @@ A Playwright reporter that integrates with TestRail via API and supports multipl
 - 🔄 Multi-project and multi-suite support
 - 🏷️ Test case mapping via tags (e.g., `@101-204-3453`)
 - 📊 Automatic test run creation
-- 📝 Automatic test run closing when test run is interrupted or timed out
-- 🔍 Comprehensive error reporting
+- 📝 On demand run closing
+- 🔍 Comprehensive error reporting (includes attachments on demand)
 
 ## Setup
 
@@ -41,6 +41,7 @@ const config: PlaywrightTestConfig = {
       username: 'your-email',
       password: 'your-password',
       includeAllCases: false,
+      includeAttachments: false,
       closeRuns: false
     }]
   ]
@@ -55,7 +56,7 @@ export default config;
 - `username`: TestRail email
 - `password`: TestRail password or API key
 - `includeAllCases`: Optional, default `false`, whether to include all cases of the suite to the test run
-- `includeAttachments`: Optional, default `false`, whether to include attachments in the test run.
+- `includeAttachments`: Optional, default `false`, whether to include attachments in the test run. **Important**: may result in longer execution time
 - `closeRuns`: Optional, default `false`, whether to close test runs in the end. **Important**: ensure that user has permissions to close runs in TestRail.
 
 ## Usage

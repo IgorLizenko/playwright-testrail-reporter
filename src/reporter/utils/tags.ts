@@ -47,17 +47,18 @@ export function parseSingleTestTags(tags: TestCase['tags']): ProjectSuiteCombo[]
         const key = `${parsedTag.projectId}-${parsedTag.suiteId}`;
         const existingGroup = groupedResults.get(key);
 
-        if (existingGroup) {
-            // Handle case when a single Playwright test have repetitions of the same tag with TestRail case ID
-            if (!existingGroup.arrayCaseIds.includes(parsedTag.caseId)) {
-                existingGroup.arrayCaseIds.push(parsedTag.caseId);
-            }
-        } else {
+        /*
+            Create new group if it doesn't exist
+            Add case ID to the existing group if case ID is not already included
+        */
+        if (!existingGroup) {
             groupedResults.set(key, {
                 projectId: parsedTag.projectId,
                 suiteId: parsedTag.suiteId,
                 arrayCaseIds: [parsedTag.caseId]
             });
+        } else if (!existingGroup.arrayCaseIds.includes(parsedTag.caseId)) {
+            existingGroup.arrayCaseIds.push(parsedTag.caseId);
         }
     }
 
