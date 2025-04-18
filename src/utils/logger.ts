@@ -30,7 +30,7 @@ const logFormat = winston.format.printf(({ level, message, timestamp, ...metadat
 });
 
 const logger = winston.createLogger({
-    level: process.env.DEBUG_MODE === 'true' ? 'debug' : 'info',
+    level: process.env.TESTRAIL_REPORTER_DEBUG_MODE === 'true' ? 'debug' : 'info',
     format: winston.format.combine(
         winston.format.colorize({ level: true }),
         winston.format.timestamp({ format: 'HH:mm:ss' }),

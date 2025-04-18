@@ -129,7 +129,7 @@ export function extractAttachmentData({
     return arrayParsedValidTags.map((tag) => {
         return {
             caseId: tag.caseId,
-            filePath: testResult.attachments.map((attachment) => attachment.path ?? '')
+            arrayFiles: testResult.attachments.map((attachment) => attachment.path ?? '')
         };
     }).flat();
 }

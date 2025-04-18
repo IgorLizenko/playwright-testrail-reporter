@@ -95,6 +95,11 @@ export type TestRailPayloadUpdateRunResult = {
     elapsed?: string
 };
 
+export type TestRailPayloadAddAttachment = {
+    resultId: TestRailBaseResult['id'],
+    attachment: string
+};
+
 // Enums
 export enum TestRailCaseStatus {
     passed = 1,

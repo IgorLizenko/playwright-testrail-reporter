@@ -1,4 +1,4 @@
-import type { TestRailBaseCase, TestRailBaseProject, TestRailBaseRun, TestRailBaseSuite, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
+import type { TestRailBaseCase, TestRailBaseProject, TestRailBaseResult, TestRailBaseRun, TestRailBaseSuite, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 export type ReporterOptions = {
     domain: string,
@@ -27,11 +27,15 @@ export type RunCreated = ProjectSuiteCombo & {
 
 export type AttachmentData = {
     caseId: TestRailBaseCase['id'],
-    filePath: string[]
+    arrayFiles: string[]
 };
 
-export type AttachmentDataWithRunId = AttachmentData & {
-    runId: TestRailBaseRun['id']
+export type RunUpdated = {
+    runId: TestRailBaseRun['id'],
+    arrayMatchedCasesToResults: {
+        caseId: TestRailBaseCase['id'],
+        resultId: TestRailBaseResult['id']
+    }[]
 };
 
 export type FinalResult = {

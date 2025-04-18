@@ -9,7 +9,7 @@ import { parseSingleTestTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
 
-import type { AttachmentData, FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated } from '@types-internal/playwright-reporter.types';
+import type { AttachmentData, FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated, RunUpdated } from '@types-internal/playwright-reporter.types';
 import type { TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -79,9 +79,9 @@ class TestRailReporter implements Reporter {
 
         await this.addResultsToRuns(finalResults);
 
-        if (this.includeAttachments) {
+        /* if (this.includeAttachments) {
             await this.addAttachments(this.arrayAttachments);
-        }
+        } */
 
         if (this.closeRuns) {
             await this.closeTestRuns(finalResults.map((finalResult) => finalResult.runId));
@@ -151,7 +151,7 @@ class TestRailReporter implements Reporter {
         });
     }
 
-    private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<{ runId: number, arrayMatchedCasesToResults: { caseId: number, resultId: number }[] }[]> {
+    private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<RunUpdated[]> {
         logger.info(`Adding results to runs ${arrayTestRuns.map((run) => run.runId).join(', ')}`);
         const results = await Promise.all(arrayTestRuns.map(async (run) => {
             const result = await this.testRailClient.addTestRunResults(run.runId, run.arrayCaseResults);
@@ -180,11 +180,6 @@ class TestRailReporter implements Reporter {
         }));
 
         return results.filter((result) => result !== null);
-    }
-
-    private async addAttachments(arrayAttachments: AttachmentData[]): Promise<void> {
-        logger.info(`Adding attachments to cases ${arrayAttachments.map((attachment) => attachment.caseId).join(', ')}`);
-        await Promise.all(arrayAttachments.map((attachment) => this.testRailClient.addAttachmentToResult(attachment.caseId, attachment.filePath[0])));
     }
 
     private async closeTestRuns(arrayRunIds: number[]): Promise<void> {
