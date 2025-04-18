@@ -1,4 +1,4 @@
-import { parseSingleTag, parseSingleTestTags } from '@reporter/utils/tags';
+import { parseArrayOfTags, parseSingleTag } from '@reporter/utils/tags';
 
 describe('Playwright tags parsing', function () {
     describe('Single tag parsing', function () {
@@ -39,7 +39,7 @@ describe('Playwright tags parsing', function () {
     describe('Test tags parsing', function () {
         it('Should parse array consisting of a single tag correctly', function () {
             const tags = ['111-222-333'];
-            expect(parseSingleTestTags(tags)).toEqual([
+            expect(parseArrayOfTags(tags)).toEqual([
                 {
                     projectId: 111,
                     suiteId: 222,
@@ -50,7 +50,7 @@ describe('Playwright tags parsing', function () {
 
         it('Should parse array of two tags correctly', function () {
             const tags = ['111-222-333', '111-222-444'];
-            expect(parseSingleTestTags(tags)).toEqual([
+            expect(parseArrayOfTags(tags)).toEqual([
                 {
                     projectId: 111,
                     suiteId: 222,
@@ -61,7 +61,7 @@ describe('Playwright tags parsing', function () {
 
         it('Should handle duplicates', function () {
             const tags = ['111-222-333', '111-222-333'];
-            expect(parseSingleTestTags(tags)).toEqual([
+            expect(parseArrayOfTags(tags)).toEqual([
                 {
                     projectId: 111,
                     suiteId: 222,
@@ -79,7 +79,7 @@ describe('Playwright tags parsing', function () {
                 '333-555-C10093', '333-555-C10094', '333-555-10093',
                 '333-666-777'
             ];
-            expect(parseSingleTestTags(tags)).toEqual([
+            expect(parseArrayOfTags(tags)).toEqual([
                 {
                     projectId: 111,
                     suiteId: 222,
@@ -109,7 +109,7 @@ describe('Playwright tags parsing', function () {
         });
 
         it('Should return null for an empty array', function () {
-            expect(parseSingleTestTags([])).toEqual(null);
+            expect(parseArrayOfTags([])).toEqual(null);
         });
     });
 });

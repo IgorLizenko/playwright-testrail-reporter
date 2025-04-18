@@ -34,7 +34,7 @@ export function parseSingleTag(tag: TestCase['tags'][number]): ParsedTag | null 
  * @returns An array of ProjectSuiteCombo objects, each containing projectId, suiteId, and an array of unique caseIds
  *          if at least one tag matches the expected format, null otherwise
  */
-export function parseSingleTestTags(tags: TestCase['tags']): ProjectSuiteCombo[] | null {
+export function parseArrayOfTags(tags: TestCase['tags']): ProjectSuiteCombo[] | null {
     const arrayParsedValidTags = tags.map((tag) => parseSingleTag(tag)).filter((parsedTag) => parsedTag !== null);
 
     if (arrayParsedValidTags.length === 0) {

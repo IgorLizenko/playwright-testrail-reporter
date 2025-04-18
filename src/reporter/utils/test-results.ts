@@ -2,7 +2,7 @@ import { stripVTControlCharacters } from 'util';
 
 import type { TestCase, TestResult } from '@playwright/test/reporter';
 
-import { parseSingleTag, parseSingleTestTags } from '@reporter/utils/tags';
+import { parseArrayOfTags, parseSingleTag } from '@reporter/utils/tags';
 
 import type { AttachmentData } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
@@ -94,7 +94,7 @@ export function convertTestResult({
     testCase: TestCase,
     testResult: TestResult
 }): TestRailPayloadUpdateRunResult[] {
-    const parsedTags = parseSingleTestTags(testCase.tags);
+    const parsedTags = parseArrayOfTags(testCase.tags);
 
     if (parsedTags) {
         return parsedTags.map((tag) => (

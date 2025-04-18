@@ -18,11 +18,11 @@
   "scripts": {
     "build": "rm -rf ./lib && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "test": "npx jest",
-    "playwright-all": "TESTRAIL_REPORTER_DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts",
-    "playwright-no-tags": "TESTRAIL_REPORTER_DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/invalid.tags.spec.ts",
-    "playwright-basic": "TESTRAIL_REPORTER_DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/basic.tags.spec.ts",
-    "playwright-multiresult": "TESTRAIL_REPORTER_DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/multiresult.spec.ts",
-    "playwright-multisuite": "TESTRAIL_REPORTER_DEBUG_MODE=true npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/multisuite.spec.ts",
+    "playwright-all": "npx playwright test -c test-playwright/playwright.config.ts",
+    "playwright-no-tags": "npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/invalid.tags.spec.ts",
+    "playwright-basic": "npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/basic.tags.spec.ts",
+    "playwright-multiresult": "npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/multiresult.spec.ts",
+    "playwright-multisuite": "npx playwright test -c test-playwright/playwright.config.ts test-playwright/tests/multisuite.spec.ts",
     "prepare": "husky"
   },
   "dependencies": {

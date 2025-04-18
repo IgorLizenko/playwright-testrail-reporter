@@ -5,7 +5,7 @@ import type {
 import { TestRail } from '@testrail-api/testrail-api';
 
 import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
-import { parseSingleTestTags } from '@reporter/utils/tags';
+import { parseArrayOfTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
 
@@ -36,6 +36,7 @@ class TestRailReporter implements Reporter {
         this.arrayAttachments = [];
         this.arrayTestRuns = null;
 
+        // Remember reporter options as 'options' object is not accessible after constructor
         this.includeAllCases = options.includeAllCases ?? false;
         this.includeAttachments = options.includeAttachments ?? false;
         this.closeRuns = options.closeRuns ?? false;
@@ -48,7 +49,7 @@ class TestRailReporter implements Reporter {
     }
 
     onBegin?(_config: FullConfig, suite: Suite): void {
-        this.arrayTestRuns = parseSingleTestTags(suite.allTests().map((test) => test.tags).flat());
+        this.arrayTestRuns = parseArrayOfTags(suite.allTests().map((test) => test.tags).flat());
         logger.debug('Runs to create', this.arrayTestRuns);
 
         if (!this.arrayTestRuns) {
@@ -89,8 +90,8 @@ class TestRailReporter implements Reporter {
         }
 
         const finalMessage = this.closeRuns
-            ? 'All test runs have been updated and closed '
-            : 'All test runs have been updated ';
+            ? 'All test runs have been updated and closed ✅'
+            : 'All test runs have been updated ✅';
 
         logger.info(finalMessage);
     }
