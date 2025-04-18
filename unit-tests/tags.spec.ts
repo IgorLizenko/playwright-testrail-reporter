@@ -20,19 +20,19 @@ describe('Playwright tags parsing', function () {
             });
         });
 
-        it('Should return undefined for empty tag', function () {
+        it('Should return null for empty tag', function () {
             const tag = '';
-            expect(parseSingleTag(tag)).toEqual(undefined);
+            expect(parseSingleTag(tag)).toEqual(null);
         });
 
-        it('Should return undefined for tag of a wrong type', function () {
+        it('Should return null for tag of a wrong type', function () {
             const tag = { a: 5 } as unknown as string;
-            expect(parseSingleTag(tag)).toEqual(undefined);
+            expect(parseSingleTag(tag)).toEqual(null);
         });
 
-        it('Should return undefined for invalid tag', function () {
+        it('Should return null for invalid tag', function () {
             const tag = '111-222-XX333';
-            expect(parseSingleTag(tag)).toEqual(undefined);
+            expect(parseSingleTag(tag)).toEqual(null);
         });
     });
 
@@ -108,8 +108,8 @@ describe('Playwright tags parsing', function () {
             ]);
         });
 
-        it('Should return undefined for an empty array', function () {
-            expect(parseSingleTestTags([])).toEqual(undefined);
+        it('Should return null for an empty array', function () {
+            expect(parseSingleTestTags([])).toEqual(null);
         });
     });
 });

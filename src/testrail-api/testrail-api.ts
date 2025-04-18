@@ -82,7 +82,6 @@ class TestRail {
             return response.data;
         }).catch((error: unknown) => {
             const errorPayload = (error as AxiosError).response?.data ?? error;
-
             logger.error(`Failed to create a test run for project ${projectId} and suite ${suiteId}`, errorPayload);
 
             return null;
@@ -108,7 +107,6 @@ class TestRail {
             })
             .catch((error: unknown) => {
                 const errorPayload = (error as AxiosError).response?.data ?? error;
-
                 logger.error(`Failed to add test run results for run ID ${runId}`, errorPayload);
 
                 return null;
@@ -139,11 +137,12 @@ class TestRail {
      */
     async addAttachmentToResult(options: TestRailPayloadAddAttachment): Promise<TestRailResponseAttachmentAdded | null> {
         const form = new formData();
-        form.append('file', createReadStream(options.attachment));
+        form.append('attachment', createReadStream(options.attachment));
+        const formHeaders = form.getHeaders();
 
         return this.client.post(`/api/v2/add_attachment_to_result/${options.resultId}`, form, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                ...formHeaders
             }
         })
             .then((response: { data: TestRailResponseAttachmentAdded }) => {

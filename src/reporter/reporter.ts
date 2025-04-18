@@ -4,7 +4,7 @@ import type {
 
 import { TestRail } from '@testrail-api/testrail-api';
 
-import { filterDuplicatingCases, groupTestResults } from '@reporter/utils/group-runs';
+import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 import { parseSingleTestTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
@@ -19,7 +19,7 @@ class TestRailReporter implements Reporter {
 
     private readonly isSetupCorrectly: boolean = false;
 
-    private arrayTestRuns: ProjectSuiteCombo[] | undefined;
+    private arrayTestRuns: ProjectSuiteCombo[] | null;
     private readonly arrayTestResults: TestRailPayloadUpdateRunResult[];
     private readonly arrayAttachments: AttachmentData[];
 
@@ -34,6 +34,7 @@ class TestRailReporter implements Reporter {
 
         this.arrayTestResults = [];
         this.arrayAttachments = [];
+        this.arrayTestRuns = null;
 
         this.includeAllCases = options.includeAllCases ?? false;
         this.includeAttachments = options.includeAttachments ?? false;
@@ -77,11 +78,11 @@ class TestRailReporter implements Reporter {
             return;
         }
 
-        await this.addResultsToRuns(finalResults);
+        const arrayRunsUpdated = await this.addResultsToRuns(finalResults);
 
-        /* if (this.includeAttachments) {
-            await this.addAttachments(this.arrayAttachments);
-        } */
+        if (this.includeAttachments) {
+            await this.addAttachments(this.arrayAttachments, arrayRunsUpdated);
+        }
 
         if (this.closeRuns) {
             await this.closeTestRuns(finalResults.map((finalResult) => finalResult.runId));
@@ -180,6 +181,23 @@ class TestRailReporter implements Reporter {
         }));
 
         return results.filter((result) => result !== null);
+    }
+
+    private async addAttachments(arrayAttachments: AttachmentData[], arrayRunsUpdated: RunUpdated[]): Promise<void> {
+        const arrayAttachmentPayloads = groupAttachments(arrayAttachments, arrayRunsUpdated);
+
+        if (arrayAttachmentPayloads.length === 0) {
+            logger.info('No attachments to add');
+
+            return;
+        }
+
+        logger.info(`Adding attachments to results ${arrayAttachmentPayloads.map((payload) => payload.resultId).join(', ')}`);
+        return;
+
+        await Promise.all(arrayAttachmentPayloads.map(async (payload) => {
+            await this.testRailClient.addAttachmentToResult(payload);
+        }));
     }
 
     private async closeTestRuns(arrayRunIds: number[]): Promise<void> {

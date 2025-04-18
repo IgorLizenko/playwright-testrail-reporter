@@ -120,7 +120,7 @@ export function extractAttachmentData({
         return [];
     }
 
-    const arrayParsedValidTags = testCase.tags.map((tag) => parseSingleTag(tag)).filter((parsedTag) => parsedTag !== undefined);
+    const arrayParsedValidTags = testCase.tags.map((tag) => parseSingleTag(tag)).filter((parsedTag) => parsedTag !== null);
 
     if (arrayParsedValidTags.length === 0) {
         return [];
@@ -129,7 +129,9 @@ export function extractAttachmentData({
     return arrayParsedValidTags.map((tag) => {
         return {
             caseId: tag.caseId,
-            arrayFiles: testResult.attachments.map((attachment) => attachment.path ?? '')
+            arrayFiles: testResult.attachments
+                .filter((attachment) => attachment.path)
+                .map((attachment) => attachment.path!)
         };
     }).flat();
 }

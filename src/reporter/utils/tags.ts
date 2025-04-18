@@ -7,12 +7,12 @@ import type { ParsedTag, ProjectSuiteCombo } from '@types-internal/playwright-re
  * where R is any non-digit character
  * @param tag - A tag string from Playwright test case tags
  * @returns ParsedTag object containing projectId, suiteId, and caseId if the tag matches the expected format,
- *          undefined otherwise
+ *          null otherwise
  * @example
  * parseSingleTag("123-456-789") // returns { projectId: 123, suiteId: 456, caseId: 789 }
  * parseSingleTag("123-456-R789") // returns { projectId: 123, suiteId: 456, caseId: 789 }
  */
-export function parseSingleTag(tag: TestCase['tags'][number]): ParsedTag | undefined {
+export function parseSingleTag(tag: TestCase['tags'][number]): ParsedTag | null {
     const regex = /(\d+)-(\d+)-\D?(\d+)/;
 
     const match = regex.exec(tag);
@@ -25,20 +25,20 @@ export function parseSingleTag(tag: TestCase['tags'][number]): ParsedTag | undef
         };
     }
 
-    return undefined;
+    return null;
 }
 
 /**
  * Parses an array of TestRail tags and groups them by project and suite. Handles duplicate case IDs by including them only once.
  * @param tags - An array of tag strings from Playwright test case tags
  * @returns An array of ProjectSuiteCombo objects, each containing projectId, suiteId, and an array of unique caseIds
- *          if at least one tag matches the expected format, undefined otherwise
+ *          if at least one tag matches the expected format, null otherwise
  */
-export function parseSingleTestTags(tags: TestCase['tags']): ProjectSuiteCombo[] | undefined {
-    const arrayParsedValidTags = tags.map((tag) => parseSingleTag(tag)).filter((parsedTag) => parsedTag !== undefined);
+export function parseSingleTestTags(tags: TestCase['tags']): ProjectSuiteCombo[] | null {
+    const arrayParsedValidTags = tags.map((tag) => parseSingleTag(tag)).filter((parsedTag) => parsedTag !== null);
 
     if (arrayParsedValidTags.length === 0) {
-        return undefined;
+        return null;
     }
 
     const groupedResults = new Map<string, ProjectSuiteCombo>();
