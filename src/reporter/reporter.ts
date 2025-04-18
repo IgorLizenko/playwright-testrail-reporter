@@ -28,7 +28,7 @@ class TestRailReporter implements Reporter {
     private readonly includeAttachments: boolean;
     private readonly closeRuns: boolean;
 
-    private readonly chunkSize: number = 2;
+    private readonly chunkSize: number;
 
     constructor(options: ReporterOptions) {
         this.isSetupCorrectly = validateSettings(options);
@@ -43,6 +43,7 @@ class TestRailReporter implements Reporter {
         this.includeAllCases = options.includeAllCases ?? false;
         this.includeAttachments = options.includeAttachments ?? false;
         this.closeRuns = options.closeRuns ?? false;
+        this.chunkSize = options.apiChunkSize ?? 10;
 
         logger.debug('Reporter options', {
             includeAllCases: this.includeAllCases,

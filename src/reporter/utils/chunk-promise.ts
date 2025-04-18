@@ -2,7 +2,7 @@ import logger from '@logger';
 
 export async function resolvePromisesInChunks<R, T>({
     arrayInputData,
-    chunkSize = 10,
+    chunkSize,
     functionToCall
 }: {
     arrayInputData: R[],

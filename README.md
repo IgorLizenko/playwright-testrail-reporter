@@ -43,7 +43,8 @@ const config: PlaywrightTestConfig = {
       password: 'your-password',
       includeAllCases: false,
       includeAttachments: false,
-      closeRuns: false
+      closeRuns: false,
+      apiChunkSize: 10
     }]
   ]
 };
@@ -61,6 +62,7 @@ export default config;
 **❗ Important**: may result in longer execution time.
 - `closeRuns`: Optional, default `false`, whether to close test runs in the end  
 **❗ Important**: ensure that user has permissions to close runs in TestRail
+- `apiChunkSize`: Optional, default `10`, the number of requests to send in parallel to TestRail API
 
 ## Usage
 

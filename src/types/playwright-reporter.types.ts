@@ -6,7 +6,8 @@ export type ReporterOptions = {
     password: string,
     includeAllCases?: boolean,
     includeAttachments?: boolean,
-    closeRuns?: boolean
+    closeRuns?: boolean,
+    apiChunkSize?: number
 };
 
 export type ParsedTag = {
