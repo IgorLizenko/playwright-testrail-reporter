@@ -55,14 +55,13 @@ class TestRail {
 
     /**
      * Creates a new test run in TestRail.
-     *
-     * @param {Object} options - Configuration object for test run creation
-     * @param {number} options.projectId - The ID of the TestRail project
-     * @param {number} options.suiteId - The ID of the test suite within the project
-     * @param {string} options.name - The name to assign to the new test run
-     * @param {number[]} options.cases - An array of test case IDs to be included in the run
-     * @param {boolean} options.includeAllCases - Whether to include all test cases from the suite
-     * @returns {Promise<TestRailResponseRunCreated | null>} The created test run data with additional information, or null if creation fails
+     * @param {Object} params - The parameters for creating a test run
+     * @param {number} params.projectId - The ID of the project
+     * @param {number} params.suiteId - The ID of the test suite
+     * @param {string} params.name - The name of the test run
+     * @param {number[]} [params.cases] - Optional array of case IDs to include in the run
+     * @param {boolean} [params.includeAllCases] - Whether to include all test cases from the suite
+     * @returns {Promise<TestRailResponseRunCreated | null>} Created test run data or null if creation fails
      */
     async addTestRun({
         projectId,
@@ -90,13 +89,12 @@ class TestRail {
 
     /**
      * Adds test results to an existing test run in TestRail.
-     *
      * @param {number} runId - The ID of the test run to update
-     * @param {TestRailPayloadUpdateRunResult[]} results - Array of test result objects
+     * @param {TestRailPayloadUpdateRunResult[]} results - Array of test results to add
      * @param {number} results[].case_id - The ID of the test case
-     * @param {number} [results[].status_id] - The status ID of the test result (e.g., passed, failed)
-     * @param {string} [results[].comment] - Additional comments or error messages for the test result
-     * @returns {Promise<TestRailResponseRunUpdated[] | null>} Array of updated test results, or null if update fails
+     * @param {TestRailCaseStatus} [results[].status_id] - The status ID of the test result (passed, failed, blocked, etc.)
+     * @param {string} [results[].comment] - Optional comment or error message for the test result
+     * @returns {Promise<TestRailResponseRunUpdated[] | null>} Array of updated test results or null if update fails
      */
     async addTestRunResults(runId: TestRailBaseRun['id'], results: TestRailPayloadUpdateRunResult[]): Promise<TestRailResponseRunUpdated[] | null> {
         return this.client.post(`/api/v2/add_results_for_cases/${runId}`, JSON.stringify({ results }))
