@@ -4,7 +4,7 @@ import axios, { AxiosError, AxiosInstance } from 'axios';
 import axiosRetry from 'axios-retry';
 
 import { ReporterOptions } from '@types-internal/playwright-reporter.types';
-import type { TestRailBaseRun, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseRunCreated, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
+import type { TestRailBaseResult, TestRailBaseRun, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseAttachmentAdded, TestRailResponseRunCreated, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -52,13 +52,15 @@ class TestRail {
     }
 
     /**
-     * Creates a new test run in TestRail for the specified project and suite.
-     * @param options Options for creating a test run
-     * @param options.projectId ID of the TestRail project
-     * @param options.suiteId ID of the test suite in the project
-     * @param options.name Name of the test run
-     * @param options.cases Array of test case IDs to include in the run
-     * @returns Promise that resolves to TestRailRunWithAdditionalData with extended run information or null if creation fails
+     * Creates a new test run in TestRail.
+     *
+     * @param {Object} options - Configuration object for test run creation
+     * @param {number} options.projectId - The ID of the TestRail project
+     * @param {number} options.suiteId - The ID of the test suite within the project
+     * @param {string} options.name - The name to assign to the new test run
+     * @param {number[]} options.cases - An array of test case IDs to be included in the run
+     * @param {boolean} options.includeAllCases - Whether to include all test cases from the suite
+     * @returns {Promise<TestRailResponseRunCreated | null>} The created test run data with additional information, or null if creation fails
      */
     async addTestRun({
         projectId,
@@ -87,12 +89,13 @@ class TestRail {
 
     /**
      * Adds test results to an existing test run in TestRail.
-     * @param runId ID of the test run to add results to
-     * @param results Array of test case results, each containing:
-     * - case_id: ID of the test case
-     * - status_id: Optional status of the test case (passed, failed, etc.)
-     * - comment: Optional comment or error message
-     * @returns Promise that resolves to the updated TestRail run
+     *
+     * @param {number} runId - The ID of the test run to update
+     * @param {TestRailPayloadUpdateRunResult[]} results - Array of test result objects
+     * @param {number} results[].case_id - The ID of the test case
+     * @param {number} [results[].status_id] - The status ID of the test result (e.g., passed, failed)
+     * @param {string} [results[].comment] - Additional comments or error messages for the test result
+     * @returns {Promise<TestRailResponseRunUpdated[] | null>} Array of updated test results, or null if update fails
      */
     async addTestRunResults(runId: TestRailBaseRun['id'], results: TestRailPayloadUpdateRunResult[]): Promise<TestRailResponseRunUpdated[] | null> {
         return this.client.post(`/api/v2/add_results_for_cases/${runId}`, JSON.stringify({ results }))
@@ -123,6 +126,27 @@ class TestRail {
             .catch((error: unknown) => {
                 const errorPayload = (error as AxiosError).response?.data ?? error;
                 logger.error(`Failed to close test run for run ID ${runId}`, errorPayload);
+            });
+    }
+
+    /**
+     * Adds an attachment to a test result in TestRail.
+     * @param resultId ID of the test result to which the attachment will be added
+     * @param attachment Attachment content to be added
+     * @returns Promise that resolves with the attachment ID, or null if the attachment fails to add
+     */
+    async addAttachmentToResult(resultId: TestRailBaseResult['id'], attachment: string): Promise<TestRailResponseAttachmentAdded | null> {
+        return this.client.post(`/api/v2/add_attachment_to_result/${resultId}`, attachment)
+            .then((response: { data: TestRailResponseAttachmentAdded }) => {
+                logger.debug(`Attachment added to result ${resultId}`);
+
+                return response.data;
+            })
+            .catch((error: unknown) => {
+                const errorPayload = (error as AxiosError).response?.data ?? error;
+                logger.error(`Failed to add attachment to result for result ID ${resultId}`, errorPayload);
+
+                return null;
             });
     }
 }

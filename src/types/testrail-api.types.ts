@@ -29,6 +29,10 @@ export type TestRailBaseUser = {
     id: number
 };
 
+export type TestRailBaseAttachment = {
+    id: number
+};
+
 /*
     Response types
 */
@@ -62,8 +66,7 @@ export type TestRailResponseRunCreated = TestRailBaseRun & {
     url: string
 };
 
-export type TestRailResponseRunUpdated = {
-    id: number,
+export type TestRailResponseRunUpdated = TestRailBaseResult & {
     test_id: number,
     status_id: TestRailCaseStatus,
     created_on: number,
@@ -76,26 +79,11 @@ export type TestRailResponseRunUpdated = {
     custom_step_results: null,
     custom_testrail_bdd_scenario_results: null,
     custom_failure_severity: null,
-    attachment_ids: number[]
+    attachment_ids: TestRailBaseAttachment['id'][]
 };
 
-/*
-    Response types
-*/
-export type TestRailResult = TestRailBaseResult & {
-    test_id: number,
-    status_id: TestRailCaseStatus,
-    created_on: number,
-    assignedto_id: TestRailBaseUser['id'] | null,
-    comment: string,
-    version: null,
-    elapsed: string,
-    defects: null,
-    created_by: TestRailBaseUser['id'],
-    custom_step_results: null,
-    custom_testrail_bdd_scenario_results: null,
-    custom_failure_severity: null,
-    attachment_ids: number[]
+export type TestRailResponseAttachmentAdded = {
+    attachment_id: TestRailBaseAttachment['id']
 };
 
 /*
