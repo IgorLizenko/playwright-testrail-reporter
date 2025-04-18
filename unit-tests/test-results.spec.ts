@@ -32,7 +32,21 @@ describe('Generate test result based on Playwright TestCase and TestResult', () 
             {
                 case_id: 333,
                 status_id: TestRailCaseStatus.passed,
-                comment: 'Basic test passed in 25s'
+                comment: 'Basic test passed in 25s',
+                elapsed: '25s'
+            }
+        ]);
+    });
+
+    it('Should convert a longer test and result to TestRail case result', () => {
+        const testResult = { ...fullTestResult, duration: 720_000 };
+        const testCase = { ...fullTestCase };
+        expect(convertTestResult({ testCase, testResult })).toEqual([
+            {
+                case_id: 333,
+                status_id: TestRailCaseStatus.passed,
+                comment: 'Basic test passed in 12m 0s',
+                elapsed: '12m 0s'
             }
         ]);
     });

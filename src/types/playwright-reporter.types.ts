@@ -15,12 +15,14 @@ export type ParsedTag = {
     caseId: TestRailBaseCase['id']
 };
 
+// All cases found in a test run grouped by project and suite IDs
 export type ProjectSuiteCombo = {
     projectId: TestRailBaseProject['id'],
     suiteId: TestRailBaseSuite['id'],
     arrayCaseIds: TestRailBaseCase['id'][]
 };
 
+// Run created in TestRail for a project-suite combo
 export type RunCreated = ProjectSuiteCombo & {
     runId: TestRailBaseRun['id']
 };

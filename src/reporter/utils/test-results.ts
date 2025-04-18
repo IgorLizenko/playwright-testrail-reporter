@@ -56,7 +56,7 @@ export function convertTestStatus(status: TestResult['status']): TestRailCaseSta
  * - unknown: "Test finished with unknown status"
  */
 export function generateTestComment(testCase: TestCase, testResult: TestResult): string {
-    const errorMessage = stripVTControlCharacters(testResult.errors[0]?.message ?? 'Unknown error');
+    const errorMessage = stripVTControlCharacters(testResult.error?.message ?? 'Unknown error');
 
     const durationString = formatMilliseconds(testResult.duration);
 
@@ -101,7 +101,8 @@ export function convertTestResult({
             tag.arrayCaseIds.map((caseId) => ({
                 case_id: caseId,
                 status_id: convertTestStatus(testResult.status),
-                comment: generateTestComment(testCase, testResult)
+                comment: generateTestComment(testCase, testResult),
+                elapsed: formatMilliseconds(testResult.duration)
             }))
         )).flat();
     }
@@ -128,7 +129,9 @@ export function extractAttachmentData({
         return [];
     }
 
-    const arrayParsedValidTags = testCase.tags.map((tag) => parseSingleTag(tag)).filter((parsedTag) => parsedTag !== null);
+    const arrayParsedValidTags = testCase.tags
+        .map((tag) => parseSingleTag(tag))
+        .filter((parsedTag) => parsedTag !== null);
 
     if (arrayParsedValidTags.length === 0) {
         return [];

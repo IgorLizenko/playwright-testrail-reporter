@@ -91,8 +91,11 @@ export type TestRailPayloadCreateRun = {
 export type TestRailPayloadUpdateRunResult = {
     case_id: TestRailBaseCase['id'],
     status_id: TestRailCaseStatus,
+    assignedto_id?: TestRailBaseUser['id'],
     comment: string,
-    elapsed?: string
+    elapsed?: string,
+    environment?: string,
+    defects?: string
 };
 
 export type TestRailPayloadAddAttachment = {

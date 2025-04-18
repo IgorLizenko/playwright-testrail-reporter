@@ -68,7 +68,7 @@ describe('Test results basic unit tests', function () {
         });
 
         it('Should generate failed comment with custom error', function () {
-            const testResult = { ...fullTestResult, status: 'failed' as const, errors: [{ message: 'Custom error' }] };
+            const testResult = { ...fullTestResult, status: 'failed' as const, error: { message: 'Custom error' } };
             expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed: Custom error');
         });
 
