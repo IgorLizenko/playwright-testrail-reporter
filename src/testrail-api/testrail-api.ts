@@ -28,8 +28,10 @@ class TestRail {
             }
         });
 
+        const retries = 3;
+
         axiosRetry(this.client, {
-            retries: 3,
+            retries,
             retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg),
             retryCondition: (error: AxiosError): boolean => {
                 return Boolean(
@@ -42,14 +44,15 @@ class TestRail {
                 logger.warn('Retrying request', {
                     attempt: retryCount,
                     url: requestUrl,
-                    error: error.message
+                    error: error.message,
+                    status: error.response?.status
                 });
             }
         });
 
         logger.debug('TestRail API client initialized', {
             baseUrl: options.domain,
-            retries: 3
+            retries
         });
     }
 
