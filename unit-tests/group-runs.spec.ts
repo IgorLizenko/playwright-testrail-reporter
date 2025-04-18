@@ -1,6 +1,6 @@
-import { filterDuplicatingCases, groupTestResults } from '@reporter/utils/group-runs';
+import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 
-import type { FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
+import type { AttachmentData, FinalResult, RunCreated, RunUpdated } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -199,6 +199,96 @@ describe('Group runs unit tests', () => {
             });
 
             expect(logger.warn).toHaveBeenCalledWith('Multiple results found for case ID:', 1);
+        });
+    });
+
+    describe('Group attachments', () => {
+        it('Should group attachments with their corresponding test results based on case IDs', () => {
+            const attachments: AttachmentData[] = [
+                {
+                    caseId: 1,
+                    arrayFiles: ['file1.png', 'file2.png']
+                },
+                {
+                    caseId: 2,
+                    arrayFiles: ['file3.png']
+                }
+            ];
+
+            const testResults: RunUpdated[] = [
+                {
+                    runId: 100,
+                    arrayMatchedCasesToResults: [
+                        { caseId: 1, resultId: 1001 },
+                        { caseId: 2, resultId: 1002 }
+                    ]
+                }
+            ];
+
+            const expected = [
+                { resultId: 1001, attachment: 'file1.png' },
+                { resultId: 1001, attachment: 'file2.png' },
+                { resultId: 1002, attachment: 'file3.png' }
+            ];
+
+            expect(groupAttachments(attachments, testResults)).toEqual(expected);
+        });
+
+        it('Should handle empty arrays', () => {
+            expect(groupAttachments([], [])).toEqual([]);
+            expect(groupAttachments([], [{ runId: 100, arrayMatchedCasesToResults: [] }])).toEqual([]);
+            expect(groupAttachments([{ caseId: 1, arrayFiles: ['file.png'] }], [])).toEqual([]);
+        });
+
+        it('Should handle cases with no matching results', () => {
+            const attachments: AttachmentData[] = [
+                {
+                    caseId: 999,
+                    arrayFiles: ['file1.png']
+                }
+            ];
+
+            const testResults: RunUpdated[] = [
+                {
+                    runId: 100,
+                    arrayMatchedCasesToResults: [
+                        { caseId: 1, resultId: 1001 }
+                    ]
+                }
+            ];
+
+            expect(groupAttachments(attachments, testResults)).toEqual([]);
+            expect(logger.error).toHaveBeenCalledWith('No matching result found for attachments of case ID:', 999);
+        });
+
+        it('Should handle multiple test runs', () => {
+            const attachments: AttachmentData[] = [
+                {
+                    caseId: 1,
+                    arrayFiles: ['file1.png']
+                }
+            ];
+
+            const testResults: RunUpdated[] = [
+                {
+                    runId: 100,
+                    arrayMatchedCasesToResults: [
+                        { caseId: 2, resultId: 1002 }
+                    ]
+                },
+                {
+                    runId: 101,
+                    arrayMatchedCasesToResults: [
+                        { caseId: 1, resultId: 1001 }
+                    ]
+                }
+            ];
+
+            const expected = [
+                { resultId: 1001, attachment: 'file1.png' }
+            ];
+
+            expect(groupAttachments(attachments, testResults)).toEqual(expected);
         });
     });
 });

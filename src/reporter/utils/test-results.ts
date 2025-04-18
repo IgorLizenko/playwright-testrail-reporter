@@ -109,6 +109,14 @@ export function convertTestResult({
     return [];
 }
 
+/**
+ * Extracts attachment data from test results based on TestRail case IDs found in test tags.
+ * @param {Object} params - The parameters object
+ * @param {TestCase} params.testCase - The test case containing tags with TestRail case IDs
+ * @param {TestResult} params.testResult - The test result containing attachments
+ * @returns {AttachmentData[]} Array of attachment data objects, each containing a TestRail case ID and array of file paths.
+ * Returns empty array if no attachments present or no valid TestRail case IDs found in tags.
+ */
 export function extractAttachmentData({
     testCase,
     testResult

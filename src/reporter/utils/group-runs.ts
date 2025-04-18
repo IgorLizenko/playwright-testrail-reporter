@@ -75,6 +75,12 @@ function filterDuplicatingCases(singleResult: FinalResult): FinalResult {
     };
 }
 
+/**
+ * Groups attachments with their corresponding test results based on case IDs.
+ * @param {AttachmentData[]} arrayAttachments - Array of attachment data containing case IDs and files
+ * @param {RunUpdated[]} arrayTestResults - Array of test run results containing case-to-result mappings
+ * @returns {TestRailPayloadAddAttachment[]} Array of mapped attachments with result IDs and file data
+ */
 function groupAttachments(arrayAttachments: AttachmentData[], arrayTestResults: RunUpdated[]): TestRailPayloadAddAttachment[] {
     if (arrayAttachments.length === 0 || arrayTestResults.length === 0) {
         return [];
