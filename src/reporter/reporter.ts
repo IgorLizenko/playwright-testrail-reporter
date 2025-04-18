@@ -168,7 +168,8 @@ class TestRailReporter implements Reporter {
             }
 
             if (result.length !== run.arrayCaseResults.length) {
-                logger.error('Number of results does not match number of cases');
+                logger.error(`Number of results does not match number of cases when updating test run ${run.runId}`);
+
                 return null;
             }
 
