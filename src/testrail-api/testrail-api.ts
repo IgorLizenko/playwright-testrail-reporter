@@ -5,7 +5,7 @@ import axios, { AxiosError, AxiosInstance } from 'axios';
 import axiosRetry from 'axios-retry';
 import formData from 'form-data';
 
-import { ReporterOptions } from '@types-internal/playwright-reporter.types';
+import type { ReporterOptions } from '@types-internal/playwright-reporter.types';
 import type { TestRailBaseRun, TestRailPayloadAddAttachment, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseAttachmentAdded, TestRailResponseRunCreated, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';

@@ -1,6 +1,6 @@
 import { validateSettings } from '@reporter/utils/validate-settings';
 
-import { ReporterOptions } from '@types-internal/playwright-reporter.types';
+import type { ReporterOptions } from '@types-internal/playwright-reporter.types';
 
 import logger from '@logger';
 

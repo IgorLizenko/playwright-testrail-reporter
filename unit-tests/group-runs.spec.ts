@@ -1,6 +1,6 @@
 import { filterDuplicatingCases, groupTestResults } from '@reporter/utils/group-runs';
 
-import { FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
+import type { FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
