@@ -30,6 +30,10 @@ export type AttachmentData = {
     filePath: string[]
 };
 
+export type AttachmentDataWithRunId = AttachmentData & {
+    runId: TestRailBaseRun['id']
+};
+
 export type FinalResult = {
     runId: TestRailBaseRun['id'],
     arrayCaseResults: TestRailPayloadUpdateRunResult[]
