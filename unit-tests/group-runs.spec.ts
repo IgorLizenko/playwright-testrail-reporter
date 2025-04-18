@@ -1,6 +1,6 @@
 import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 
-import type { AttachmentData, FinalResult, RunCreated, RunUpdated } from '@types-internal/playwright-reporter.types';
+import type { AttachmentData, CaseResultMatch, FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -215,14 +215,9 @@ describe('Group runs unit tests', () => {
                 }
             ];
 
-            const testResults: RunUpdated[] = [
-                {
-                    runId: 100,
-                    arrayMatchedCasesToResults: [
-                        { caseId: 1, resultId: 1001 },
-                        { caseId: 2, resultId: 1002 }
-                    ]
-                }
+            const testResults: CaseResultMatch[] = [
+                { caseId: 1, resultId: 1001 },
+                { caseId: 2, resultId: 1002 }
             ];
 
             const expected = [
@@ -236,7 +231,7 @@ describe('Group runs unit tests', () => {
 
         it('Should handle empty arrays', () => {
             expect(groupAttachments([], [])).toEqual([]);
-            expect(groupAttachments([], [{ runId: 100, arrayMatchedCasesToResults: [] }])).toEqual([]);
+            expect(groupAttachments([], [{ caseId: 4, resultId: 1004 }])).toEqual([]);
             expect(groupAttachments([{ caseId: 1, arrayFiles: ['file.png'] }], [])).toEqual([]);
         });
 
@@ -248,13 +243,8 @@ describe('Group runs unit tests', () => {
                 }
             ];
 
-            const testResults: RunUpdated[] = [
-                {
-                    runId: 100,
-                    arrayMatchedCasesToResults: [
-                        { caseId: 1, resultId: 1001 }
-                    ]
-                }
+            const testResults: CaseResultMatch[] = [
+                { caseId: 1, resultId: 1001 }
             ];
 
             expect(groupAttachments(attachments, testResults)).toEqual([]);
@@ -269,19 +259,9 @@ describe('Group runs unit tests', () => {
                 }
             ];
 
-            const testResults: RunUpdated[] = [
-                {
-                    runId: 100,
-                    arrayMatchedCasesToResults: [
-                        { caseId: 2, resultId: 1002 }
-                    ]
-                },
-                {
-                    runId: 101,
-                    arrayMatchedCasesToResults: [
-                        { caseId: 1, resultId: 1001 }
-                    ]
-                }
+            const testResults: CaseResultMatch[] = [
+                { caseId: 2, resultId: 1002 },
+                { caseId: 1, resultId: 1001 }
             ];
 
             const expected = [

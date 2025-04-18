@@ -1,4 +1,4 @@
-import type { AttachmentData, FinalResult, RunCreated, RunUpdated } from '@types-internal/playwright-reporter.types';
+import type { AttachmentData, CaseResultMatch, FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
 import type { TestRailPayloadAddAttachment, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 import { TestRailCaseStatus } from '@types-internal/testrail-api.types';
 
@@ -78,22 +78,18 @@ function filterDuplicatingCases(singleResult: FinalResult): FinalResult {
 /**
  * Groups attachments with their corresponding test results based on case IDs.
  * @param {AttachmentData[]} arrayAttachments - Array of attachment data containing case IDs and files
- * @param {RunUpdated[]} arrayTestResults - Array of test run results containing case-to-result mappings
+ * @param {CaseResultMatch[]} arrayCaseResults - Array of case-to-result mappings
  * @returns {TestRailPayloadAddAttachment[]} Array of mapped attachments with result IDs and file data
  */
-function groupAttachments(arrayAttachments: AttachmentData[], arrayTestResults: RunUpdated[]): TestRailPayloadAddAttachment[] {
-    if (arrayAttachments.length === 0 || arrayTestResults.length === 0) {
+function groupAttachments(arrayAttachments: AttachmentData[], arrayCaseResults: CaseResultMatch[]): TestRailPayloadAddAttachment[] {
+    if (arrayAttachments.length === 0 || arrayCaseResults.length === 0) {
         return [];
     }
 
     const mappedAttachments: TestRailPayloadAddAttachment[] = [];
 
-    const allCaseResultMappings = arrayTestResults.flatMap((run) =>
-        run.arrayMatchedCasesToResults
-    );
-
     arrayAttachments.forEach((attachment) => {
-        const matchingResult = allCaseResultMappings.find((mapping) =>
+        const matchingResult = arrayCaseResults.find((mapping) =>
             mapping.caseId === attachment.caseId
         );
 

@@ -9,7 +9,7 @@ import { parseSingleTestTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
 
-import type { AttachmentData, FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated, RunUpdated } from '@types-internal/playwright-reporter.types';
+import type { AttachmentData, CaseResultMatch, FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated } from '@types-internal/playwright-reporter.types';
 import type { TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -157,7 +157,7 @@ class TestRailReporter implements Reporter {
         });
     }
 
-    private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<RunUpdated[]> {
+    private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<CaseResultMatch[]> {
         logger.info(`Adding results to runs ${arrayTestRuns.map((run) => run.runId).join(', ')}`);
         const results = await Promise.all(arrayTestRuns.map(async (run) => {
             const result = await this.testRailClient.addTestRunResults(run.runId, run.arrayCaseResults);
@@ -179,16 +179,13 @@ class TestRailReporter implements Reporter {
                 };
             });
 
-            return {
-                runId: run.runId,
-                arrayMatchedCasesToResults
-            };
+            return arrayMatchedCasesToResults;
         }));
 
-        return results.filter((result) => result !== null);
+        return results.flat().filter((result) => result !== null);
     }
 
-    private async addAttachments(arrayAttachments: AttachmentData[], arrayRunsUpdated: RunUpdated[]): Promise<void> {
+    private async addAttachments(arrayAttachments: AttachmentData[], arrayRunsUpdated: CaseResultMatch[]): Promise<void> {
         const arrayAttachmentPayloads = groupAttachments(arrayAttachments, arrayRunsUpdated);
 
         if (arrayAttachmentPayloads.length === 0) {

@@ -30,12 +30,9 @@ export type AttachmentData = {
     arrayFiles: string[]
 };
 
-export type RunUpdated = {
-    runId: TestRailBaseRun['id'],
-    arrayMatchedCasesToResults: {
-        caseId: TestRailBaseCase['id'],
-        resultId: TestRailBaseResult['id']
-    }[]
+export type CaseResultMatch = {
+    caseId: TestRailBaseCase['id'],
+    resultId: TestRailBaseResult['id']
 };
 
 export type FinalResult = {

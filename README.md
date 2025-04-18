@@ -56,8 +56,10 @@ export default config;
 - `username`: TestRail email
 - `password`: TestRail password or API key
 - `includeAllCases`: Optional, default `false`, whether to include all cases of the suite to the test run
-- `includeAttachments`: Optional, default `false`, whether to include attachments in the test run. **Important**: may result in longer execution time
-- `closeRuns`: Optional, default `false`, whether to close test runs in the end. **Important**: ensure that user has permissions to close runs in TestRail.
+- `includeAttachments`**![Beta](https://img.shields.io/badge/status-beta-red)**: Optional, default `false`, whether to include attachments in the test run.  
+**Important**: may result in longer execution time
+- `closeRuns`: Optional, default `false`, whether to close test runs in the end.  
+**Important**: ensure that user has permissions to close runs in TestRail.
 
 ## Usage
 
@@ -112,6 +114,10 @@ If you have multiple Playwright tests that match the same TestRail case, the rep
 
 1. If all Playwright tests finish with the same status, the TestRail case will be marked with that status, and the comment (and error in case of fail) will be generated from the first test that finished.
 2. If any Playwright tests finish with different statuses, the reporter will prioritize the following statuses in order: passed, failed, blocked, untested.
+
+### Know Issues
+
+When several Playwright tests match the same TestRail case, each test will upload its attachments to the TestRail case. This may result in duplicate attachments.
 
 ## Contributing
 
