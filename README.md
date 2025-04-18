@@ -2,17 +2,18 @@
 
 # Playwright TestRail Reporter with multi project support
 
-## Overview
+A Playwright reporter that integrates with TestRail via API and supports multiple projects and test suites.  
 
-A Playwright reporter that integrates with TestRail via API and supports multiple projects and test suites. This reporter automatically creates test runs and updates test results in TestRail based on your Playwright test execution.
+This reporter automatically creates test runs and updates test results in TestRail based on your Playwright test execution.
 
-### Features
+### Key Features
 
 - 🔄 Multi-project and multi-suite support
 - 🏷️ Test case mapping via tags (e.g., `@101-204-3453`)
-- 📊 Automatic test run creation
-- 📝 On demand run closing
-- 🔍 Comprehensive error reporting (includes attachments on demand)
+- 📊 Automatic test run creation and updating
+- 📝 Automatic run closing (optional)
+- 🔍 Comprehensive error reporting
+- 🖼️ Attachment support (optional)
 
 ## Setup
 
@@ -52,14 +53,14 @@ export default config;
 
 #### Options
 
-- `domain`: TestRail domain (e.g., `https://yourdomain.testrail.io`)
+- `domain`: TestRail domain URL
 - `username`: TestRail email
 - `password`: TestRail password or API key
 - `includeAllCases`: Optional, default `false`, whether to include all cases of the suite to the test run
-- `includeAttachments`**![Beta](https://img.shields.io/badge/status-beta-red)**: Optional, default `false`, whether to include attachments in the test run.  
-**Important**: may result in longer execution time
-- `closeRuns`: Optional, default `false`, whether to close test runs in the end.  
-**Important**: ensure that user has permissions to close runs in TestRail.
+- `includeAttachments`**![Beta](https://img.shields.io/badge/status-beta-red)**: Optional, default `false`, whether to include attachments in the test run  
+**❗ Important**: may result in longer execution time.
+- `closeRuns`: Optional, default `false`, whether to close test runs in the end  
+**❗ Important**: ensure that user has permissions to close runs in TestRail
 
 ## Usage
 
@@ -104,22 +105,26 @@ If you want to have more detailed logs, consider setting `TESTRAIL_REPORTER_DEBU
 
 ## Additional information
 
-### Creating and Updating Test Runs
+#### Graceful Failure Logic
+
+The reporter logs errors to the console if it is not configured correctly or if any API calls fail. It does not throw errors and allows test execution to continue.
+
+#### Creating and Updating Test Runs
 
 TestRail test runs are created after all tests finish their execution. If Playwright run results in a timeout or interrupted statuses, test runs are not created.
 
-### API Retry Logic
+#### API Retry Logic
 
 The reporter will retry the API calls up to 3 times if the API call fails with a 5xx status code.
 
-### Multiple Playwright Tests Matching One TestRail Case
+#### Multiple Playwright Tests Matching One TestRail Case
 
 If you have multiple Playwright tests that match the same TestRail case, the reporter will abide by the following rules:
 
 1. If all Playwright tests finish with the same status, the TestRail case will be marked with that status, and the comment (and error in case of fail) will be generated from the first test that finished.
 2. If any Playwright tests finish with different statuses, the reporter will prioritize the following statuses in order: passed, failed, blocked, untested.
 
-### Know Issues
+#### Know Issues
 
 When several Playwright tests match the same TestRail case, each test will upload its attachments to the TestRail case. This may result in duplicate attachments.
 
