@@ -44,6 +44,20 @@ function convertTestStatus(status: TestResult['status']): TestRailCaseStatus {
     }
 }
 
+function formatErrorMessage(arrayErrors: TestResult['errors']): string {
+    if (arrayErrors.length === 0) {
+        return 'Unknown error';
+    }
+
+    if (arrayErrors.length === 1) {
+        return stripVTControlCharacters(arrayErrors[0].message ?? 'Unknown error');
+    }
+
+    return arrayErrors.map((error, index) => {
+        return `Error #${index + 1}: ${stripVTControlCharacters(error.message ?? 'Unknown error')}`;
+    }).join('\n');
+}
+
 /**
  * Generates a comment string based on the Playwright test result.
  * @param testResult The Playwright test result object.
@@ -56,15 +70,13 @@ function convertTestStatus(status: TestResult['status']): TestRailCaseStatus {
  * - unknown: "Test finished with unknown status"
  */
 function generateTestComment(testCase: TestCase, testResult: TestResult): string {
-    const errorMessage = stripVTControlCharacters(testResult.error?.message ?? 'Unknown error');
-
     const durationString = formatMilliseconds(testResult.duration);
 
     switch (testResult.status) {
         case 'passed':
             return `${testCase.title} passed in ${durationString}`;
         case 'failed':
-            return `${testCase.title} failed: ${errorMessage}`;
+            return `${testCase.title} failed:\n${formatErrorMessage(testResult.errors)}`;
         case 'timedOut':
             return `${testCase.title} timed out in ${durationString}`;
         case 'interrupted':

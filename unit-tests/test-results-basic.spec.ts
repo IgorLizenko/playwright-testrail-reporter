@@ -57,6 +57,11 @@ describe('Test results basic unit tests', function () {
             expect(generateTestComment(testCase, testResult)).toEqual('Basic test passed in 1s');
         });
 
+        it('Should generate passed comment if test is in passed status but has some errors', function () {
+            const testResult = { ...fullTestResult, errors: [{ message: 'Custom error' }] };
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test passed in 1s');
+        });
+
         it('Should generate passed comment for a test that runs for several minutes', function () {
             const testResult = { ...fullTestResult, duration: 360_000 };
             expect(generateTestComment(testCase, testResult)).toEqual('Basic test passed in 6m 0s');
@@ -64,12 +69,40 @@ describe('Test results basic unit tests', function () {
 
         it('Should generate failed comment with unknown error', function () {
             const testResult = { ...fullTestResult, status: 'failed' as const };
-            expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed: Unknown error');
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed:\nUnknown error');
+        });
+
+        it('Should generate failed comment with unknown error if test has an empty errors array', function () {
+            const testResult = { ...fullTestResult, status: 'failed' as const, errors: [] };
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed:\nUnknown error');
         });
 
         it('Should generate failed comment with custom error', function () {
-            const testResult = { ...fullTestResult, status: 'failed' as const, error: { message: 'Custom error' } };
-            expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed: Custom error');
+            const testResult = { ...fullTestResult, status: 'failed' as const, errors: [{ message: 'Custom error' }] };
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed:\nCustom error');
+        });
+
+        it('Should generate failed comment for existing errors array with no message', function () {
+            const testResult = { ...fullTestResult, status: 'failed' as const, errors: [{}] };
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed:\nUnknown error');
+        });
+
+        it('Should format errors if test had several of them', function () {
+            const testResult = {
+                ...fullTestResult,
+                status: 'failed' as const,
+                errors: [{ message: 'Custom error 1' }, { message: 'Custom error 2' }, { message: 'Another error' }]
+            };
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed:\nError #1: Custom error 1\nError #2: Custom error 2\nError #3: Another error');
+        });
+
+        it('Should format errors if test had several of them and some of them are unvalid', function () {
+            const testResult = {
+                ...fullTestResult,
+                status: 'failed' as const,
+                errors: [{ message: 'Custom error 1' }, {}, { message: 'Another error' }]
+            };
+            expect(generateTestComment(testCase, testResult)).toEqual('Basic test failed:\nError #1: Custom error 1\nError #2: Unknown error\nError #3: Another error');
         });
 
         it('Should generate timed out comment', function () {
