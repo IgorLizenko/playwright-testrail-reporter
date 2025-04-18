@@ -1,5 +1,5 @@
-import type { FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
-import type { TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
+import type { AttachmentData, FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
+import type { TestRailPayloadUpdateRunResult, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
 import { TestRailCaseStatus } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -75,4 +75,9 @@ function filterDuplicatingCases(singleResult: FinalResult): FinalResult {
     };
 }
 
-export { groupTestResults, filterDuplicatingCases };
+function groupAttachments(arrayAttachments: AttachmentData[], arrayTestResults: TestRailResponseRunUpdated[]): void {
+    console.log(arrayAttachments);
+    console.log(arrayTestResults);
+}
+
+export { groupTestResults, filterDuplicatingCases, groupAttachments };

@@ -25,6 +25,11 @@ export type RunCreated = ProjectSuiteCombo & {
     runId: TestRailBaseRun['id']
 };
 
+export type AttachmentData = {
+    caseId: TestRailBaseCase['id'],
+    filePath: string[]
+};
+
 export type FinalResult = {
     runId: TestRailBaseRun['id'],
     arrayCaseResults: TestRailPayloadUpdateRunResult[]

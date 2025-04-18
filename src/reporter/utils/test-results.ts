@@ -2,8 +2,9 @@ import { stripVTControlCharacters } from 'util';
 
 import type { TestCase, TestResult } from '@playwright/test/reporter';
 
-import { parseSingleTestTags } from '@reporter/utils/tags';
+import { parseSingleTag, parseSingleTestTags } from '@reporter/utils/tags';
 
+import type { AttachmentData } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 function formatMilliseconds(ms: number): string {
@@ -106,4 +107,29 @@ export function convertTestResult({
     }
 
     return [];
+}
+
+export function extractAttachmentData({
+    testCase,
+    testResult
+}: {
+    testCase: TestCase,
+    testResult: TestResult
+}): AttachmentData[] {
+    if (testResult.attachments.length === 0) {
+        return [];
+    }
+
+    const arrayParsedValidTags = testCase.tags.map((tag) => parseSingleTag(tag)).filter((parsedTag) => parsedTag !== undefined);
+
+    if (arrayParsedValidTags.length === 0) {
+        return [];
+    }
+
+    return arrayParsedValidTags.map((tag) => {
+        return {
+            caseId: tag.caseId,
+            filePath: testResult.attachments.map((attachment) => attachment.path ?? '')
+        };
+    }).flat();
 }

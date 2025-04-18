@@ -6,11 +6,11 @@ import { TestRail } from '@testrail-api/testrail-api';
 
 import { filterDuplicatingCases, groupTestResults } from '@reporter/utils/group-runs';
 import { parseSingleTestTags } from '@reporter/utils/tags';
-import { convertTestResult } from '@reporter/utils/test-results';
+import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
 
-import type { FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated } from '@types-internal/playwright-reporter.types';
-import type { TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
+import type { AttachmentData, FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated } from '@types-internal/playwright-reporter.types';
+import type { TestRailPayloadUpdateRunResult, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -21,6 +21,7 @@ class TestRailReporter implements Reporter {
 
     private arrayTestRuns: ProjectSuiteCombo[] | undefined;
     private readonly arrayTestResults: TestRailPayloadUpdateRunResult[];
+    private readonly arrayAttachments: AttachmentData[];
 
     private readonly includeAllCases: boolean;
     private readonly includeAttachments: boolean;
@@ -32,6 +33,7 @@ class TestRailReporter implements Reporter {
         this.testRailClient = new TestRail(options);
 
         this.arrayTestResults = [];
+        this.arrayAttachments = [];
 
         this.includeAllCases = options.includeAllCases ?? false;
         this.includeAttachments = options.includeAttachments ?? false;
@@ -56,6 +58,7 @@ class TestRailReporter implements Reporter {
     onTestEnd(testCase: TestCase, testResult: TestResult): void {
         logger.debug(`Test "${testCase.title}" finished with ${testResult.status} status`);
         this.arrayTestResults.push(...convertTestResult({ testCase, testResult }));
+        this.arrayAttachments.push(...extractAttachmentData({ testCase, testResult }));
     }
 
     async onEnd(result: FullResult): Promise<void> {
@@ -75,6 +78,10 @@ class TestRailReporter implements Reporter {
         }
 
         await this.addResultsToRuns(finalResults);
+
+        if (this.includeAttachments) {
+            await this.addAttachments(this.arrayAttachments);
+        }
 
         if (this.closeRuns) {
             await this.closeTestRuns(finalResults.map((finalResult) => finalResult.runId));
@@ -144,9 +151,14 @@ class TestRailReporter implements Reporter {
         });
     }
 
-    private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<void> {
+    private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<(TestRailResponseRunUpdated | null)[]> {
         logger.info(`Adding results to runs ${arrayTestRuns.map((run) => run.runId).join(', ')}`);
-        await Promise.all(arrayTestRuns.map((run) => this.testRailClient.addTestRunResults(run.runId, run.arrayCaseResults)));
+        return (await Promise.all(arrayTestRuns.map((run) => this.testRailClient.addTestRunResults(run.runId, run.arrayCaseResults)))).flat();
+    }
+
+    private async addAttachments(arrayAttachments: AttachmentData[]): Promise<void> {
+        logger.info(`Adding attachments to cases ${arrayAttachments.map((attachment) => attachment.caseId).join(', ')}`);
+        await Promise.all(arrayAttachments.map((attachment) => this.testRailClient.addAttachmentToResult(attachment.caseId, attachment.filePath[0])));
     }
 
     private async closeTestRuns(arrayRunIds: number[]): Promise<void> {

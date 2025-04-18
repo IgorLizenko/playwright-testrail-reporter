@@ -50,13 +50,6 @@ export type TestRailResponseRunCreated = TestRailBaseRun & {
     untested_count: number,
     retest_count: number,
     failed_count: number,
-    custom_status1_count: number,
-    custom_status2_count: number,
-    custom_status3_count: number,
-    custom_status4_count: number,
-    custom_status5_count: number,
-    custom_status6_count: number,
-    custom_status7_count: number,
     project_id: TestRailBaseProject['id'],
     plan_id: number | null,
     created_on: number,
@@ -76,9 +69,6 @@ export type TestRailResponseRunUpdated = TestRailBaseResult & {
     elapsed: string,
     defects: null,
     created_by: TestRailBaseUser['id'],
-    custom_step_results: null,
-    custom_testrail_bdd_scenario_results: null,
-    custom_failure_severity: null,
     attachment_ids: TestRailBaseAttachment['id'][]
 };
 
