@@ -98,6 +98,10 @@ npx playwright test
 
 Your test results will be automatically sent to TestRail.
 
+### Logging
+
+If you want to have more detailed logs, consider setting `TESTRAIL_REPORTER_DEBUG_MODE` environment variable to `true`.
+
 ## Additional information
 
 ### Creating and Updating Test Runs
