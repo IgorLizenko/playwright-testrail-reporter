@@ -135,24 +135,27 @@ class TestRail {
      * @param attachment Attachment content to be added
      * @returns Promise that resolves with the attachment ID, or null if the attachment fails to add
      */
-    async addAttachmentToResult(options: TestRailPayloadAddAttachment): Promise<TestRailResponseAttachmentAdded | null> {
+    async addAttachmentToResult({
+        resultId,
+        attachment
+    }: TestRailPayloadAddAttachment): Promise<TestRailResponseAttachmentAdded | null> {
         const form = new formData();
-        form.append('attachment', createReadStream(options.attachment));
+        form.append('attachment', createReadStream(attachment));
         const formHeaders = form.getHeaders();
 
-        return this.client.post(`/api/v2/add_attachment_to_result/${options.resultId}`, form, {
+        return this.client.post(`/api/v2/add_attachment_to_result/${resultId}`, form, {
             headers: {
                 ...formHeaders
             }
         })
             .then((response: { data: TestRailResponseAttachmentAdded }) => {
-                logger.debug(`Attachment added to result ${options.resultId}`);
+                logger.debug(`Attachment added to result ${resultId}`);
 
                 return response.data;
             })
             .catch((error: unknown) => {
                 const errorPayload = (error as AxiosError).response?.data ?? error;
-                logger.error(`Failed to add attachment to result for result ID ${options.resultId}`, errorPayload);
+                logger.error(`Failed to add attachment to result for result ID ${resultId}`, errorPayload);
 
                 return null;
             });
