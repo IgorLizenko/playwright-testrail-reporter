@@ -1,7 +1,9 @@
+import { createReadStream } from 'fs';
 import { Agent } from 'https';
 
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import axiosRetry from 'axios-retry';
+import formData from 'form-data';
 
 import { ReporterOptions } from '@types-internal/playwright-reporter.types';
 import type { TestRailBaseResult, TestRailBaseRun, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseAttachmentAdded, TestRailResponseRunCreated, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
@@ -136,7 +138,14 @@ class TestRail {
      * @returns Promise that resolves with the attachment ID, or null if the attachment fails to add
      */
     async addAttachmentToResult(resultId: TestRailBaseResult['id'], attachment: string): Promise<TestRailResponseAttachmentAdded | null> {
-        return this.client.post(`/api/v2/add_attachment_to_result/${resultId}`, attachment)
+        const form = new formData();
+        form.append('file', createReadStream(attachment));
+
+        return this.client.post(`/api/v2/add_attachment_to_result/${resultId}`, form, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
             .then((response: { data: TestRailResponseAttachmentAdded }) => {
                 logger.debug(`Attachment added to result ${resultId}`);
 

@@ -26,7 +26,11 @@ export default defineConfig({
         }]
     ],
     use: {
-        trace: 'on-first-retry'
+        trace: 'on-first-retry',
+        screenshot: {
+            mode: 'on',
+            fullPage: true
+        }
     },
     projects: [
         {
