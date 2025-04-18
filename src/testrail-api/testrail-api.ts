@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Agent } from 'https';
 
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import axiosRetry from 'axios-retry';
 
 import { ReporterOptions } from '@types-internal/playwright-reporter.types';
-import { TestRailCase, TestRailCaseStatus, TestRailProject, TestRailRun, TestRailSuite } from '@types-internal/testrail-api.types';
+import type { TestRailBaseRun, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseRunCreated, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -67,19 +66,13 @@ class TestRail {
         name,
         cases,
         includeAllCases
-    }: {
-        projectId: TestRailProject['id'],
-        suiteId: TestRailSuite['id'],
-        name: TestRailRun['name'],
-        cases: TestRailCase['id'][],
-        includeAllCases: boolean
-    }): Promise<TestRailRun | null> {
+    }: TestRailPayloadCreateRun): Promise<TestRailResponseRunCreated | null> {
         return this.client.post(`/api/v2/add_run/${projectId}`, {
             suite_id: suiteId,
             name,
             case_ids: cases,
             include_all: includeAllCases
-        }).then((response: { data: TestRailRun }) => {
+        }).then((response: { data: TestRailResponseRunCreated }) => {
             logger.debug(`Run created with ID: ${response.data.id}`);
 
             return response.data;
@@ -101,13 +94,9 @@ class TestRail {
      * - comment: Optional comment or error message
      * @returns Promise that resolves to the updated TestRail run
      */
-    async addTestRunResults(runId: TestRailRun['id'], results: {
-        case_id: TestRailCase['id'],
-        status_id?: TestRailCaseStatus,
-        comment?: string
-    }[]): Promise<TestRailRun | null> {
+    async addTestRunResults(runId: TestRailBaseRun['id'], results: TestRailPayloadUpdateRunResult[]): Promise<TestRailResponseRunUpdated[] | null> {
         return this.client.post(`/api/v2/add_results_for_cases/${runId}`, JSON.stringify({ results }))
-            .then((response: { data: TestRailRun }) => {
+            .then((response: { data: TestRailResponseRunUpdated[] }) => {
                 logger.debug(`Results added to run ${runId}`);
 
                 return response.data;
@@ -126,7 +115,7 @@ class TestRail {
      * @param runId ID of the test run to close
      * @returns Promise that resolves when the run is closed
      */
-    async closeTestRun(runId: TestRailRun['id']): Promise<void> {
+    async closeTestRun(runId: TestRailBaseRun['id']): Promise<void> {
         await this.client.post(`/api/v2/close_run/${runId}`)
             .then(() => {
                 logger.debug(`Run ${runId} closed`);

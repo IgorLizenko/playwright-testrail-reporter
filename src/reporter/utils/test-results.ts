@@ -4,7 +4,7 @@ import type { TestCase, TestResult } from '@playwright/test/reporter';
 
 import { parseSingleTestTags } from '@reporter/utils/tags';
 
-import { TestRailCaseResult, TestRailCaseStatus } from '@types-internal/testrail-api.types';
+import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 function formatMilliseconds(ms: number): string {
     const seconds = Math.ceil(ms / 1000);
@@ -92,7 +92,7 @@ export function convertTestResult({
 }: {
     testCase: TestCase,
     testResult: TestResult
-}): TestRailCaseResult[] {
+}): TestRailPayloadUpdateRunResult[] {
     const parsedTags = parseSingleTestTags(testCase.tags);
 
     if (parsedTags) {

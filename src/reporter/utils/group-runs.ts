@@ -1,5 +1,5 @@
 import type { FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
-import type { TestRailCaseResult } from '@types-internal/testrail-api.types';
+import type { TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 import { TestRailCaseStatus } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -9,7 +9,7 @@ import logger from '@logger';
  * @param runsCreated Array of runs with their case IDs
  * @returns Array of final results grouped by runs
  */
-function groupTestResults(arrayTestResults: TestRailCaseResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
+function groupTestResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
     if (arrayTestRuns.length === 0) {
         logger.error('No test runs provided');
     }
@@ -37,7 +37,7 @@ function groupTestResults(arrayTestResults: TestRailCaseResult[], arrayTestRuns:
  * @param b Second test case result
  * @returns Positive if b has higher priority, negative if a has higher priority
  */
-function compareByStatusPriority(a: TestRailCaseResult, b: TestRailCaseResult): number {
+function compareByStatusPriority(a: TestRailPayloadUpdateRunResult, b: TestRailPayloadUpdateRunResult): number {
     const priorityOrder: Record<TestRailCaseStatus, number> = {
         [TestRailCaseStatus.passed]: 4,
         [TestRailCaseStatus.failed]: 3,
@@ -53,13 +53,13 @@ function compareByStatusPriority(a: TestRailCaseResult, b: TestRailCaseResult): 
  * @returns The same final result with no duplicating cases
  */
 function filterDuplicatingCases(singleResult: FinalResult): FinalResult {
-    const caseResultsMap = new Map<number, TestRailCaseResult[]>();
+    const caseResultsMap = new Map<number, TestRailPayloadUpdateRunResult[]>();
     for (const result of singleResult.arrayCaseResults) {
         const existing = caseResultsMap.get(result.case_id) ?? [];
         caseResultsMap.set(result.case_id, [...existing, result]);
     }
 
-    const filteredResults: TestRailCaseResult[] = [];
+    const filteredResults: TestRailPayloadUpdateRunResult[] = [];
     for (const [, caseResults] of caseResultsMap) {
         if (caseResults.length === 1) {
             filteredResults.push(caseResults[0]);

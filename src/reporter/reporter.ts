@@ -10,7 +10,7 @@ import { convertTestResult } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
 
 import type { FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated } from '@types-internal/playwright-reporter.types';
-import type { TestRailCaseResult } from '@types-internal/testrail-api.types';
+import type { TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -20,7 +20,7 @@ class TestRailReporter implements Reporter {
     private readonly isSetupCorrectly: boolean = false;
 
     private arrayTestRuns: ProjectSuiteCombo[] | undefined;
-    private readonly arrayTestResults: TestRailCaseResult[];
+    private readonly arrayTestResults: TestRailPayloadUpdateRunResult[];
 
     private readonly includeAllCases: boolean;
     private readonly includeAttachments: boolean;
@@ -36,6 +36,12 @@ class TestRailReporter implements Reporter {
         this.includeAllCases = options.includeAllCases ?? false;
         this.includeAttachments = options.includeAttachments ?? false;
         this.closeRuns = options.closeRuns ?? false;
+
+        logger.debug('Reporter options', {
+            includeAllCases: this.includeAllCases,
+            includeAttachments: this.includeAttachments,
+            closeRuns: this.closeRuns
+        });
     }
 
     onBegin?(_config: FullConfig, suite: Suite): void {
@@ -132,7 +138,7 @@ class TestRailReporter implements Reporter {
         return arrayTestRunsCreated;
     }
 
-    private compileFinalResults(arrayTestResults: TestRailCaseResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
+    private compileFinalResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
         return groupTestResults(arrayTestResults, arrayTestRuns).map((finalResult) => {
             return filterDuplicatingCases(finalResult);
         });

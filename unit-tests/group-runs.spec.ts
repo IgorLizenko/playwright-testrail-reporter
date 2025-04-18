@@ -1,7 +1,7 @@
 import { filterDuplicatingCases, groupTestResults } from '@reporter/utils/group-runs';
 
 import { FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
-import { TestRailCaseResult, TestRailCaseStatus } from '@types-internal/testrail-api.types';
+import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -17,7 +17,7 @@ describe('Group runs unit tests', () => {
 
     describe('Group test results', () => {
         it('Should group single run and single test result', () => {
-            const arrayTestResults: TestRailCaseResult[] = [
+            const arrayTestResults: TestRailPayloadUpdateRunResult[] = [
                 { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' }
             ];
 
@@ -36,7 +36,7 @@ describe('Group runs unit tests', () => {
         });
 
         it('Should log an error when no runs are provided', () => {
-            const arrayTestResults: TestRailCaseResult[] = [];
+            const arrayTestResults: TestRailPayloadUpdateRunResult[] = [];
             const arrayTestRuns: RunCreated[] = [];
 
             groupTestResults(arrayTestResults, arrayTestRuns);
@@ -45,14 +45,14 @@ describe('Group runs unit tests', () => {
         });
 
         it('Should return empty array when no runs are provided', () => {
-            const arrayTestResults: TestRailCaseResult[] = [];
+            const arrayTestResults: TestRailPayloadUpdateRunResult[] = [];
             const arrayTestRuns: RunCreated[] = [];
 
             expect(groupTestResults(arrayTestResults, arrayTestRuns)).toEqual([]);
         });
 
         it('Should log an error when no matching cases are found for a run', () => {
-            const arrayTestResults: TestRailCaseResult[] = [
+            const arrayTestResults: TestRailPayloadUpdateRunResult[] = [
                 { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' }
             ];
 
@@ -66,7 +66,7 @@ describe('Group runs unit tests', () => {
         });
 
         it('Should group multiple test case with the same run', () => {
-            const arrayTestResults: TestRailCaseResult[] = [
+            const arrayTestResults: TestRailPayloadUpdateRunResult[] = [
                 { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
                 { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' }
             ];
@@ -87,7 +87,7 @@ describe('Group runs unit tests', () => {
         });
 
         it('Should group multiple test cases with multiple runs', () => {
-            const arrayTestResults: TestRailCaseResult[] = [
+            const arrayTestResults: TestRailPayloadUpdateRunResult[] = [
                 { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
                 { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' },
                 { case_id: 3, status_id: TestRailCaseStatus.passed, comment: 'Test 3' },
