@@ -29,7 +29,7 @@ function formatMilliseconds(ms: number): string {
  * - skipped -> TestRailCaseStatus.blocked
  * - others -> TestRailCaseStatus.untested
  */
-export function convertTestStatus(status: TestResult['status']): TestRailCaseStatus {
+function convertTestStatus(status: TestResult['status']): TestRailCaseStatus {
     switch (status) {
         case 'passed':
             return TestRailCaseStatus.passed;
@@ -55,7 +55,7 @@ export function convertTestStatus(status: TestResult['status']): TestRailCaseSta
  * - skipped: "Test skipped"
  * - unknown: "Test finished with unknown status"
  */
-export function generateTestComment(testCase: TestCase, testResult: TestResult): string {
+function generateTestComment(testCase: TestCase, testResult: TestResult): string {
     const errorMessage = stripVTControlCharacters(testResult.error?.message ?? 'Unknown error');
 
     const durationString = formatMilliseconds(testResult.duration);
@@ -87,7 +87,7 @@ export function generateTestComment(testCase: TestCase, testResult: TestResult):
  * - comment: Generated comment about test execution
  * Returns empty array if no TestRail case IDs found in tags
  */
-export function convertTestResult({
+function convertTestResult({
     testCase,
     testResult
 }: {
@@ -118,7 +118,7 @@ export function convertTestResult({
  * @returns {AttachmentData[]} Array of attachment data objects, each containing a TestRail case ID and array of file paths.
  * Returns empty array if no attachments present or no valid TestRail case IDs found in tags.
  */
-export function extractAttachmentData({
+function extractAttachmentData({
     testCase,
     testResult
 }: {
@@ -146,3 +146,5 @@ export function extractAttachmentData({
         };
     }).flat();
 }
+
+export { convertTestStatus, generateTestComment, convertTestResult, extractAttachmentData };
