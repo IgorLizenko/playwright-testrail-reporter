@@ -6,7 +6,7 @@ import axiosRetry from 'axios-retry';
 import formData from 'form-data';
 
 import type { ReporterOptions } from '@types-internal/playwright-reporter.types';
-import type { TestRailBaseRun, TestRailPayloadAddAttachment, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseAttachmentAdded, TestRailResponseRunCreated, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
+import type { TestRailBaseRun, TestRailBaseSuite, TestRailPayloadAddAttachment, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseAttachmentAdded, TestRailResponseRunCreated, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -53,6 +53,26 @@ class TestRail {
             baseUrl: options.domain,
             retries
         });
+    }
+
+    /**
+     * Retrieves information about a specific test suite from TestRail.
+     * @param {number} suiteId - The ID of the test suite to retrieve
+     * @returns {Promise<TestRailBaseSuite | null>} Suite information if found, null if retrieval fails
+     */
+    async getSuiteInfo(suiteId: TestRailBaseSuite['id']): Promise<TestRailBaseSuite | null> {
+        return this.client.get(`/api/v2/get_suite/${suiteId}`)
+            .then((response: { data: TestRailBaseSuite }) => {
+                logger.debug(`Suite info retrieved for suite ID: ${suiteId}`);
+
+                return response.data;
+            })
+            .catch((error: unknown) => {
+                const errorPayload = (error as AxiosError).response?.data ?? error;
+                logger.error(`Failed to retrieve suite info for suite ID ${suiteId}`, errorPayload);
+
+                return null;
+            });
     }
 
     /**

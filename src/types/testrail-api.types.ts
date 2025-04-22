@@ -4,11 +4,20 @@
     Base types that are used both in requests and responses
 */
 export type TestRailBaseProject = {
-    id: number
+    id: number,
+    is_completed: boolean,
+    name: string,
+    show_announcement: boolean,
+    suite_mode: number,
+    url: string
 };
 
 export type TestRailBaseSuite = {
-    id: number
+    id: number,
+    description: string | null,
+    name: string,
+    project_id: TestRailBaseProject['id'],
+    url: string
 };
 
 export type TestRailBaseCase = {

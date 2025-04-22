@@ -115,4 +115,14 @@ describe('TestRail API: Retry Logic', () => {
         expect(logger.warn).toHaveBeenCalledTimes(2);
         expect(result).toEqual({ id: 103, name: 'Test Run' });
     });
+
+    it('Should retry on network error for idempotent requests', async () => {
+        mock.onGet('/api/v2/get_suite/1').networkError();
+
+        await client.getSuiteInfo(1);
+
+        const error = new Error('Network Error');
+        expect(logger.warn).toHaveBeenCalledTimes(3);
+        expect(logger.error).toHaveBeenCalledWith('Failed to retrieve suite info for suite ID 1', error);
+    });
 });

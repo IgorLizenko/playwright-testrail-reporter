@@ -30,6 +30,29 @@ describe('TestRail API: Main methods tests', () => {
         mock.reset();
     });
 
+    describe('getSuiteInfo', () => {
+        it('Should return suite info and log debug on successful response', async () => {
+            mock.onGet('/api/v2/get_suite/1').reply(200, { id: 123, name: 'Test Suite' });
+
+            const result = await client.getSuiteInfo(1);
+
+            expect(logger.warn).not.toHaveBeenCalled();
+            expect(logger.debug).toHaveBeenCalledWith('Suite info retrieved for suite ID: 1');
+            expect(result).toEqual({ id: 123, name: 'Test Suite' });
+        });
+
+        it('Should return null and log error on error', async () => {
+            mock.onGet('/api/v2/get_suite/1').reply(403);
+
+            const result = await client.getSuiteInfo(1);
+
+            expect(logger.warn).not.toHaveBeenCalled();
+            const error = new Error('Request failed with status code 403');
+            expect(logger.error).toHaveBeenCalledWith('Failed to retrieve suite info for suite ID 1', error);
+            expect(result).toBeNull();
+        });
+    });
+
     describe('addTestRun', () => {
         it('Should return data and log debug on successful response', async () => {
             mock.onPost('/api/v2/add_run/1').reply(200, { id: 123, name: 'Test Run' });
