@@ -6,7 +6,7 @@ import axiosRetry from 'axios-retry';
 import formData from 'form-data';
 
 import type { ReporterOptions } from '@types-internal/playwright-reporter.types';
-import type { TestRailBaseRun, TestRailBaseSuite, TestRailPayloadAddAttachment, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseAttachmentAdded, TestRailResponseRunCreated, TestRailResponseRunUpdated } from '@types-internal/testrail-api.types';
+import type { TestRailBaseResult, TestRailBaseRun, TestRailBaseSuite, TestRailPayloadAddAttachment, TestRailPayloadCreateRun, TestRailPayloadUpdateRunResult, TestRailResponseAttachmentAdded, TestRailResponseRunCreated } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -116,11 +116,11 @@ class TestRail {
      * @param {number} results[].case_id - The ID of the test case
      * @param {TestRailCaseStatus} [results[].status_id] - The status ID of the test result (passed, failed, blocked, etc.)
      * @param {string} [results[].comment] - Optional comment or error message for the test result
-     * @returns {Promise<TestRailResponseRunUpdated[] | null>} Array of updated test results or null if update fails
+     * @returns {Promise<TestRailBaseResult[] | null>} Array of updated test results or null if update fails
      */
-    async addTestRunResults(runId: TestRailBaseRun['id'], results: TestRailPayloadUpdateRunResult[]): Promise<TestRailResponseRunUpdated[] | null> {
+    async addTestRunResults(runId: TestRailBaseRun['id'], results: TestRailPayloadUpdateRunResult[]): Promise<TestRailBaseResult[] | null> {
         return this.client.post(`/api/v2/add_results_for_cases/${runId}`, JSON.stringify({ results }))
-            .then((response: { data: TestRailResponseRunUpdated[] }) => {
+            .then((response: { data: TestRailBaseResult[] }) => {
                 logger.debug(`Results added to run ${runId}`);
 
                 return response.data;

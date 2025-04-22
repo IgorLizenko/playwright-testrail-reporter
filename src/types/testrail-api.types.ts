@@ -49,7 +49,11 @@ export type TestRailBaseResult = {
     created_on: number,
     elapsed: string,
     status_id: TestRailCaseStatus,
-    test_id: TestRailBaseCase['id']
+    test_id: TestRailBaseCase['id'],
+    assignedto_id: TestRailBaseUser['id'] | null,
+    version: string | null,
+    defects: string | null,
+    attachment_ids: TestRailBaseAttachment['id'][]
 };
 
 export type TestRailBaseUser = {
@@ -67,10 +71,8 @@ export type TestRailBaseAttachment = {
     Response types
 */
 export type TestRailResponseRunCreated = TestRailBaseRun & {
-    suite_id: TestRailBaseSuite['id'],
     milestone_id: number | null,
     assignedto_id: TestRailBaseUser['id'] | null,
-    include_all: boolean,
     is_completed: boolean,
     completed_on: number | null,
     config: null,
@@ -82,24 +84,8 @@ export type TestRailResponseRunCreated = TestRailBaseRun & {
     failed_count: number,
     project_id: TestRailBaseProject['id'],
     plan_id: number | null,
-    created_on: number,
     updated_on: number,
-    refs: string | null,
-    created_by: TestRailBaseUser['id'],
-    url: string
-};
-
-export type TestRailResponseRunUpdated = TestRailBaseResult & {
-    test_id: number,
-    status_id: TestRailCaseStatus,
-    created_on: number,
-    assignedto_id: TestRailBaseUser['id'] | null,
-    comment: string,
-    version: null,
-    elapsed: string,
-    defects: null,
-    created_by: TestRailBaseUser['id'],
-    attachment_ids: TestRailBaseAttachment['id'][]
+    refs: string | null
 };
 
 export type TestRailResponseAttachmentAdded = {
@@ -112,7 +98,7 @@ export type TestRailResponseAttachmentAdded = {
 export type TestRailPayloadCreateRun = {
     projectId: TestRailBaseProject['id'],
     suiteId: TestRailBaseSuite['id'],
-    name: TestRailBaseRun['name'],
+    name: string,
     description?: string,
     cases: TestRailBaseCase['id'][],
     includeAllCases?: boolean
