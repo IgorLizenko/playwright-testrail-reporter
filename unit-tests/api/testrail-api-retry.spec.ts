@@ -45,6 +45,40 @@ describe('TestRail API: Retry Logic', () => {
         expect(result).toEqual({ id: 123, name: 'Test Run' });
     });
 
+    it('Should log warn all retry attempts', async () => {
+        mock.onPost('/api/v2/add_run/1').replyOnce(500)
+            .onPost('/api/v2/add_run/1').replyOnce(501)
+            .onPost('/api/v2/add_run/1').reply(503);
+
+        await client.addTestRun({
+            projectId: 1,
+            suiteId: 1,
+            name: 'Test Run',
+            cases: [],
+            includeAllCases: true
+        });
+
+        expect(logger.warn).toHaveBeenCalledTimes(3);
+        expect(logger.warn).toHaveBeenCalledWith('Retrying request', {
+            attempt: 1,
+            url: '/api/v2/add_run/1',
+            error: 'Request failed with status code 500',
+            status: 500
+        });
+        expect(logger.warn).toHaveBeenCalledWith('Retrying request', {
+            attempt: 2,
+            url: '/api/v2/add_run/1',
+            error: 'Request failed with status code 501',
+            status: 501
+        });
+        expect(logger.warn).toHaveBeenCalledWith('Retrying request', {
+            attempt: 3,
+            url: '/api/v2/add_run/1',
+            error: 'Request failed with status code 503',
+            status: 503
+        });
+    });
+
     it('Should retry on 5xx error', async () => {
         mock.onPost('/api/v2/add_run/1').reply(500);
 

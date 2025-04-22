@@ -40,10 +40,9 @@ class TestRail {
                 );
             },
             onRetry: (retryCount, error) => {
-                const requestUrl = error.config?.url ?? 'unknown';
                 logger.warn('Retrying request', {
                     attempt: retryCount,
-                    url: requestUrl,
+                    url: error.config?.url,
                     error: error.message,
                     status: error.response?.status
                 });

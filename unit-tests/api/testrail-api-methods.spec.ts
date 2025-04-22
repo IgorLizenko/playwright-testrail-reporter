@@ -66,7 +66,7 @@ describe('TestRail API: Main methods tests', () => {
     });
 
     describe('addTestRunResults', () => {
-        it('Should return data on successful response', async () => {
+        it('Should return data and log debug on successful response', async () => {
             mock.onPost('/api/v2/add_results_for_cases/1').reply(200, [{ id: 123, name: 'Test Run Result' }]);
 
             const result = await client.addTestRunResults(1, [{ case_id: 1, status_id: 1, comment: 'Test comment' }]);
@@ -89,9 +89,11 @@ describe('TestRail API: Main methods tests', () => {
     });
 
     describe('closeTestRun', () => {
-        it('Should log debug message on successful response', async () => {
+        it('Should log debug on successful response', async () => {
             mock.onPost('/api/v2/close_run/1').reply(200);
             await client.closeTestRun(1);
+
+            expect(logger.warn).not.toHaveBeenCalled();
             expect(logger.debug).toHaveBeenCalledWith('Run 1 closed');
         });
 
@@ -99,13 +101,14 @@ describe('TestRail API: Main methods tests', () => {
             mock.onPost('/api/v2/close_run/1').reply(403);
             await client.closeTestRun(1);
 
+            expect(logger.warn).not.toHaveBeenCalled();
             const error = new Error('Request failed with status code 403');
             expect(logger.error).toHaveBeenCalledWith('Failed to close test run for run ID 1', error);
         });
     });
 
     describe('addAttachmentToResult', () => {
-        it('Should return data on successful response', async () => {
+        it('Should return data and log debug on successful response', async () => {
             mock.onPost('/api/v2/add_attachment_to_result/1').reply(200, { id: 123, name: 'Test Attachment' });
 
             const result = await client.addAttachmentToResult({
@@ -118,7 +121,7 @@ describe('TestRail API: Main methods tests', () => {
             expect(result).toEqual({ id: 123, name: 'Test Attachment' });
         });
 
-        it('Should return null on error', async () => {
+        it('Should return null log error on error', async () => {
             mock.onPost('/api/v2/add_attachment_to_result/1').reply(403);
 
             const result = await client.addAttachmentToResult({
