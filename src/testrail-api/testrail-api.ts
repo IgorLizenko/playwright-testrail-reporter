@@ -156,7 +156,7 @@ class TestRail {
             })
             .catch((error: unknown) => {
                 const errorPayload = (error as AxiosError).response?.data ?? error;
-                logger.error(`Failed to add attachment to result for result ID ${resultId}`, errorPayload);
+                logger.error(`Failed to add attachment to result ${resultId}`, errorPayload);
 
                 return null;
             });
