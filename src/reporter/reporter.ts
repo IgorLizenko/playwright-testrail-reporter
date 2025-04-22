@@ -5,6 +5,7 @@ import type {
 import { TestRail } from '@testrail-api/testrail-api';
 
 import { resolvePromisesInChunks } from '@reporter/utils/chunk-promise';
+import { formatTestRunName } from '@reporter/utils/format-run-name';
 import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 import { parseArrayOfTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
@@ -27,8 +28,8 @@ class TestRailReporter implements Reporter {
     private readonly includeAllCases: boolean;
     private readonly includeAttachments: boolean;
     private readonly closeRuns: boolean;
-
     private readonly chunkSize: number;
+    private readonly runNameTemplate: string;
 
     constructor(options: ReporterOptions) {
         this.isSetupCorrectly = validateSettings(options);
@@ -44,6 +45,7 @@ class TestRailReporter implements Reporter {
         this.includeAttachments = options.includeAttachments ?? false;
         this.closeRuns = options.closeRuns ?? false;
         this.chunkSize = options.apiChunkSize ?? 10;
+        this.runNameTemplate = options.runNameTemplate ?? 'Playwright Run ${date}';
 
         logger.debug('Reporter options', {
             includeAllCases: this.includeAllCases,
@@ -133,7 +135,7 @@ class TestRailReporter implements Reporter {
             chunkSize: this.chunkSize,
             functionToCall: async (projectSuiteCombo) => {
                 logger.info(`Creating a test run for project ${projectSuiteCombo.projectId} and suite ${projectSuiteCombo.suiteId}... ⌛`);
-                const name = `Playwright Run ${new Date().toUTCString()}`;
+                const name = formatTestRunName(this.runNameTemplate);
                 const response = await this.testRailClient.addTestRun({
                     projectId: projectSuiteCombo.projectId,
                     suiteId: projectSuiteCombo.suiteId,

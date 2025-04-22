@@ -63,6 +63,14 @@ export default config;
 - `closeRuns`: Optional, default `false`, whether to close test runs in the end  
 **❗ Important**: ensure that user has permissions to close runs in TestRail
 - `apiChunkSize`: Optional, default `10`, the number of requests to send in parallel to TestRail API
+- `runNameTemplate`: Optional, default `Playwright Run ${date}`, the template for the run name
+
+#### Run Name Template Options
+- `${date}`: The current date and time in `YYYY/MM/DD HH:MM:SS UTC` format (e.g. `2025/22/04 14:27:58 UTC`)
+- `${timestamp}`: The current timestamp (e.g. `1745392678000`)
+- `${suite}`: Test suite name  
+**❗ Important**: `${suite}` requires an additional API call to TestRail for each test run, which may result in longer execution time.
+
 
 ## Usage
 
