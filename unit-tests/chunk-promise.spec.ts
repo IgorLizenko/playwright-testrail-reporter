@@ -11,6 +11,15 @@ describe('Resolve promises in chunks', () => {
         jest.clearAllMocks();
     });
 
+    it('Should return array of resolved promises', async () => {
+        const result = await resolvePromisesInChunks({
+            arrayInputData: [1, 2, 3],
+            chunkSize: 10,
+            functionToCall: (input) => Promise.resolve(input)
+        });
+        expect(result).toEqual([1, 2, 3]);
+    });
+
     it('Should return empty array when input data is empty', async () => {
         const result = await resolvePromisesInChunks({
             arrayInputData: [],
