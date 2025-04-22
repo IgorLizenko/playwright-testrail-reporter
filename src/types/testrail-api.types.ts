@@ -21,21 +21,42 @@ export type TestRailBaseSuite = {
 };
 
 export type TestRailBaseCase = {
-    id: number
+    id: number,
+    title: string,
+    created_on: number,
+    created_by: TestRailBaseUser['id'],
+    suite_id: TestRailBaseSuite['id'],
+    type_id: number,
+    updated_by: TestRailBaseUser['id'],
+    updated_on: number
 };
 
 export type TestRailBaseRun = {
     id: number,
     name: string,
+    created_by: TestRailBaseUser['id'],
+    created_on: number,
+    include_all: boolean,
+    suite_id: TestRailBaseSuite['id'],
+    url: string,
     description: string | null
 };
 
 export type TestRailBaseResult = {
-    id: number
+    id: number,
+    comment: string,
+    created_by: TestRailBaseUser['id'],
+    created_on: number,
+    elapsed: string,
+    status_id: TestRailCaseStatus,
+    test_id: TestRailBaseCase['id']
 };
 
 export type TestRailBaseUser = {
-    id: number
+    id: number,
+    email: string,
+    is_active: boolean,
+    name: string
 };
 
 export type TestRailBaseAttachment = {
