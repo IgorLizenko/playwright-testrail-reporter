@@ -16,7 +16,7 @@ function formatDate(): string {
         return acc;
     }, {});
 
-    return `${values.year}/${values.day}/${values.month} ${values.hour}:${values.minute}:${values.second} UTC`;
+    return `${values.year}/${values.month}/${values.day} ${values.hour}:${values.minute}:${values.second} UTC`;
 }
 
 export function formatTestRunName(template: string, suiteName?: string): string {
