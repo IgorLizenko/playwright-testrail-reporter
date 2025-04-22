@@ -1,6 +1,6 @@
 import { stripVTControlCharacters } from 'util';
 
-import type { TestCase, TestResult } from '@playwright/test/reporter';
+import type { TestCase, TestError, TestResult } from '@playwright/test/reporter';
 
 import { parseArrayOfTags, parseSingleTag } from '@reporter/utils/tags';
 
@@ -44,18 +44,24 @@ function convertTestStatus(status: TestResult['status']): TestRailCaseStatus {
     }
 }
 
+function formatSingleError(error: TestError): string {
+    const errorMessage = error.stack ?? error.message ?? 'Unknown error';
+
+    return stripVTControlCharacters(errorMessage);
+}
+
 function formatErrorMessage(arrayErrors: TestResult['errors']): string {
     if (arrayErrors.length === 0) {
         return 'Unknown error';
     }
 
     if (arrayErrors.length === 1) {
-        return stripVTControlCharacters(arrayErrors[0].message ?? 'Unknown error');
+        return formatSingleError(arrayErrors[0]);
     }
 
     return arrayErrors.map((error, index) => {
-        return `Error #${index + 1}: ${stripVTControlCharacters(error.message ?? 'Unknown error')}`;
-    }).join('\n');
+        return `Error #${index + 1}: ${formatSingleError(error)}`;
+    }).join('\n\n');
 }
 
 /**
@@ -76,7 +82,7 @@ function generateTestComment(testCase: TestCase, testResult: TestResult): string
         case 'passed':
             return `${testCase.title} passed in ${durationString}`;
         case 'failed':
-            return `${testCase.title} failed:\n${formatErrorMessage(testResult.errors)}`;
+            return `${testCase.title} failed\n\n${formatErrorMessage(testResult.errors)}`;
         case 'timedOut':
             return `${testCase.title} timed out in ${durationString}`;
         case 'interrupted':
