@@ -121,7 +121,7 @@ describe('TestRail API: Main methods tests', () => {
             expect(result).toEqual({ id: 123, name: 'Test Attachment' });
         });
 
-        it('Should return null log error on error', async () => {
+        it('Should return null and log error on error', async () => {
             mock.onPost('/api/v2/add_attachment_to_result/1').reply(403);
 
             const result = await client.addAttachmentToResult({
