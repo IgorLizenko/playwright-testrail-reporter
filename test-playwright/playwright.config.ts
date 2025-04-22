@@ -22,7 +22,8 @@ export default defineConfig({
             password: process.env.TESTRAIL_PASSWORD,
             includeAllCases: false,
             includeAttachments: true,
-            closeRuns: true
+            closeRuns: true,
+            runNameTemplate: '${suite} Run ${date}'
         }]
     ],
     use: {

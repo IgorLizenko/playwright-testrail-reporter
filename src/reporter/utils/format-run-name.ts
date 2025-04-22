@@ -19,11 +19,15 @@ function formatDate(): string {
     return `${values.year}/${values.day}/${values.month} ${values.hour}:${values.minute}:${values.second} UTC`;
 }
 
-export function formatTestRunName(template: string): string {
+export function formatTestRunName(template: string, suiteName?: string): string {
     let result = template;
 
     result = result.replaceAll('${date}', formatDate());
     result = result.replaceAll('${timestamp}', Date.now().toString());
+
+    if (suiteName) {
+        result = result.replaceAll('${suite}', suiteName);
+    }
 
     return result;
 }

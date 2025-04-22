@@ -50,7 +50,8 @@ class TestRailReporter implements Reporter {
         logger.debug('Reporter options', {
             includeAllCases: this.includeAllCases,
             includeAttachments: this.includeAttachments,
-            closeRuns: this.closeRuns
+            closeRuns: this.closeRuns,
+            runNameTemplate: this.runNameTemplate
         });
     }
 
@@ -135,7 +136,11 @@ class TestRailReporter implements Reporter {
             chunkSize: this.chunkSize,
             functionToCall: async (projectSuiteCombo) => {
                 logger.info(`Creating a test run for project ${projectSuiteCombo.projectId} and suite ${projectSuiteCombo.suiteId}... ⌛`);
-                const name = formatTestRunName(this.runNameTemplate);
+                const suiteName = this.runNameTemplate.includes('${suite}')
+                    ? (await this.testRailClient.getSuiteInfo(projectSuiteCombo.suiteId))?.name
+                    : undefined;
+
+                const name = formatTestRunName(this.runNameTemplate, suiteName);
                 const response = await this.testRailClient.addTestRun({
                     projectId: projectSuiteCombo.projectId,
                     suiteId: projectSuiteCombo.suiteId,
