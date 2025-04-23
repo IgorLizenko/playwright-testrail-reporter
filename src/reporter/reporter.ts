@@ -5,14 +5,14 @@ import type {
 import { TestRail } from '@testrail-api/testrail-api';
 
 import { resolvePromisesInChunks } from '@reporter/utils/chunk-promise';
-import { formatTestRunName } from '@reporter/utils/format-run-name';
+import { formatTestRunName, TEMPLATE_DATE, TEMPLATE_SUITE } from '@reporter/utils/format-run-name';
 import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 import { parseArrayOfTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
 
 import type { AttachmentData, CaseResultMatch, FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated } from '@types-internal/playwright-reporter.types';
-import type { TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
+import type { TestRailBaseSuite, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 
@@ -45,7 +45,7 @@ class TestRailReporter implements Reporter {
         this.includeAttachments = options.includeAttachments ?? false;
         this.closeRuns = options.closeRuns ?? false;
         this.chunkSize = options.apiChunkSize ?? 10;
-        this.runNameTemplate = options.runNameTemplate ?? 'Playwright Run ${date}';
+        this.runNameTemplate = options.runNameTemplate ?? `Playwright Run ${TEMPLATE_DATE}`;
 
         logger.debug('Reporter options', {
             includeAllCases: this.includeAllCases,
@@ -128,6 +128,12 @@ class TestRailReporter implements Reporter {
         return true;
     }
 
+    private async getSuiteName(suiteId: TestRailBaseSuite['id']): Promise<string | undefined> {
+        return this.runNameTemplate.includes(TEMPLATE_SUITE)
+            ? (await this.testRailClient.getSuiteInfo(suiteId))?.name
+            : undefined;
+    }
+
     private async createTestRuns(arrayTestRuns: ProjectSuiteCombo[]): Promise<RunCreated[]> {
         logger.debug('Runs to create', arrayTestRuns);
 
@@ -136,9 +142,7 @@ class TestRailReporter implements Reporter {
             chunkSize: this.chunkSize,
             functionToCall: async (projectSuiteCombo) => {
                 logger.info(`Creating a test run for project ${projectSuiteCombo.projectId} and suite ${projectSuiteCombo.suiteId}... ⌛`);
-                const suiteName = this.runNameTemplate.includes('${suite}')
-                    ? (await this.testRailClient.getSuiteInfo(projectSuiteCombo.suiteId))?.name
-                    : undefined;
+                const suiteName = await this.getSuiteName(projectSuiteCombo.suiteId);
 
                 const name = formatTestRunName(this.runNameTemplate, suiteName);
                 const response = await this.testRailClient.addTestRun({
