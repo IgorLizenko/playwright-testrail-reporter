@@ -54,25 +54,18 @@ const config: PlaywrightTestConfig = {
 export default config;
 ```
 
-#### Options
+Reporter options:
 
-- `domain`: TestRail domain URL
-- `username`: TestRail email
-- `password`: TestRail password or API key
-- `includeAllCases`: Optional, default `false`, whether to include all cases of the suite to the test run
-- `includeAttachments`: Optional, default `false`, whether to include attachments in the test run  
-**❗ Important**: may result in longer execution time.
-- `closeRuns`: Optional, default `false`, whether to close test runs in the end  
-**❗ Important**: ensure that user has permissions to close runs in TestRail
-- `apiChunkSize`: Optional, default `10`, the number of requests to send in parallel to TestRail API
-- `runNameTemplate`: Optional, default `Playwright Run #{date}`, the template for the run name
-
-#### Run Name Template Options
-- `#{date}`: The current date and time in `YYYY/MM/DD HH:MM:SS UTC` format (e.g. `2025/04/22 14:27:58 UTC`)
-- `#{timestamp}`: The current timestamp (e.g. `1745392678000`)
-- `#{suite}`: Test suite name  
-**❗ Important**: `#{suite}` requires an additional API call to TestRail for each test run, which may result in longer execution time
-
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `domain` | `string` | Required | TestRail domain URL |
+| `username` | `string` | Required | TestRail email |
+| `password` | `string` | Required | TestRail password or API key |
+| `includeAllCases` | `boolean` | `false` | Whether to include all cases of the TestRail suite to the test run |
+| `includeAttachments` | `boolean` | `false` | Whether to to upload attachments for the test run.<br>Note: May result in longer execution time as each attachment requires a separate API call |
+| `closeRuns` | `boolean` | `false` | Whether to close test runs in the end.<br>Note: Ensure user has permissions to close runs in TestRail |
+| `apiChunkSize` | `number` | `10` | The number of requests to send in parallel to TestRail API |
+| `runNameTemplate` | `string` | `Playwright Run #{date}` | Template for the test run name.<br>Supports variables:<br>• `#{date}`: Current date/time in `YYYY/MM/DD HH:MM:SS UTC` format<br>• `#{timestamp}`: Current timestamp in milliseconds<br>• `#{suite}`: Test suite name (increases execution time as it requires additional API call per each test run) |
 
 ## Usage
 
