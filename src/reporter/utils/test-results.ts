@@ -9,6 +9,11 @@ import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-inter
 
 import logger from '@logger';
 
+/**
+ * Formats a duration in milliseconds to a human-readable string.
+ * @param ms The duration in milliseconds
+ * @returns A formatted string in the format "Xs" for durations under 1 minute, or "Xm Ys" for durations over 1 minute
+ */
 function formatMilliseconds(ms: number): string {
     const seconds = Math.ceil(ms / 1000);
 
@@ -46,12 +51,22 @@ function convertTestStatus(status: TestResult['status']): TestRailCaseStatus {
     }
 }
 
+/**
+ * Formats a single test error into a readable string.
+ * @param error The test error object to format
+ * @returns A formatted error message string with control characters stripped
+ */
 function formatSingleError(error: TestError): string {
     const errorMessage = error.stack ?? error.message ?? 'Unknown error';
 
     return stripVTControlCharacters(errorMessage);
 }
 
+/**
+ * Formats an array of test errors into a single readable message.
+ * @param arrayErrors Array of test errors to format
+ * @returns A formatted string containing all error messages. If multiple errors exist, they are numbered and separated by newlines
+ */
 function formatErrorMessage(arrayErrors: TestResult['errors']): string {
     if (arrayErrors.length === 0) {
         return 'Unknown error';
@@ -66,10 +81,24 @@ function formatErrorMessage(arrayErrors: TestResult['errors']): string {
     }).join('\n\n');
 }
 
+/**
+ * Formats a success message for a passed test.
+ * @param title The test title
+ * @param duration The formatted test duration
+ * @returns A formatted success message string
+ */
 function formatPassedMessage(title: string, duration: string): string {
     return `${title} passed in ${duration}`;
 }
 
+/**
+ * Formats a failure message for a failed test.
+ * @param params Object containing test details
+ * @param params.title The test title
+ * @param params.duration The formatted test duration
+ * @param params.errors Array of test errors
+ * @returns A formatted failure message string including error details
+ */
 function formatFailedMessage({
     title,
     duration,
@@ -118,10 +147,13 @@ function generateTestComment(testCase: TestCase, testResult: TestResult): string
 
 /**
  * Updates test results based on test steps by matching TestRail case IDs.
- * For each non-errored test step that contains a valid TestRail case ID, marks the corresponding test result as passed.
+ * For each non-errored test step, extracts all TestRail case IDs from its title and marks
+ * the corresponding test results as passed. A single test step can contain multiple TestRail case IDs.
  *
- * @param {TestRailPayloadUpdateRunResult[]} arrayTestResults - Array of test results to be updated
- * @param {TestStep[]} testSteps - Array of test steps to process
+ * @param {Object} params - The parameters object
+ * @param {TestRailPayloadUpdateRunResult[]} params.arrayTestResults - Array of test results to be updated
+ * @param {TestStep[]} params.arrayTestSteps - Array of test steps to process
+ * @param {TestCase['title']} params.testName - The name of the test case
  * @returns {TestRailPayloadUpdateRunResult[]} Updated array of test results with modified status_id values
  */
 function alterTestResultsFromSteps({
