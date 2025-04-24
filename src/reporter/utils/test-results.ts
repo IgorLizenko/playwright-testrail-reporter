@@ -139,7 +139,7 @@ function alterTestResultsFromSteps({
         const arrayMatchingCaseIds = testStep.title.matchAll(REGEX_TAG_STEP);
 
         for (const regexResult of arrayMatchingCaseIds) {
-            const parsedCaseId = parseInt(regexResult[1]);
+            const parsedCaseId = parseInt(regexResult[1], 10);
 
             const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === parsedCaseId);
             const duration = formatMilliseconds(testStep.duration);
