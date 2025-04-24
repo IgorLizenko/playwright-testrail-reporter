@@ -62,7 +62,7 @@ Reporter options:
 | `username` | `string` | Required | TestRail email |
 | `password` | `string` | Required | TestRail password or API key |
 | `includeAllCases` | `boolean` | `false` | Whether to include all cases of the TestRail suite to the test run |
-| `includeAttachments` | `boolean` | `false` | Whether to to upload attachments for the test run.<br>Note: May result in longer execution time as each attachment requires a separate API call |
+| `includeAttachments` | `boolean` | `false` | Whether to upload attachments for the test run.<br>Note: May result in longer execution time as each attachment requires a separate API call |
 | `closeRuns` | `boolean` | `false` | Whether to close test runs in the end.<br>Note: Ensure user has permissions to close runs in TestRail |
 | `apiChunkSize` | `number` | `10` | The number of requests to send in parallel to TestRail API |
 | `runNameTemplate` | `string` | `Playwright Run #{date}` | Template for the test run name.<br>Supports variables:<br>• `#{date}`: Current date/time in `YYYY/MM/DD HH:MM:SS UTC` format<br>• `#{timestamp}`: Current timestamp in milliseconds<br>• `#{suite}`: Test suite name (increases execution time as it requires additional API call per each test run) |
