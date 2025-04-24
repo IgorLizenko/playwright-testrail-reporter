@@ -17,19 +17,19 @@ describe('Test results with test steps', () => {
     } as TestStep;
 
     const testStepNotMatching = {
-        title: 'Step 1 [R333]',
+        title: 'Step 1 @R333',
         duration: 5_000,
         category: 'test.step'
     } as TestStep;
 
     const testStepPassing = {
-        title: 'Step 1 [C555]',
+        title: 'Step 1 @C555',
         duration: 5_000,
         category: 'test.step'
     } as TestStep;
 
     const testStepFailing = {
-        title: 'Step 1 [555]',
+        title: 'Step 1 @555',
         duration: 5_000,
         category: 'test.step',
         error: { message: 'Custom error', stack: 'Stack' }
@@ -94,7 +94,7 @@ describe('Test results with test steps', () => {
         expect(results).toEqual([
             {
                 case_id: 555,
-                comment: 'Step 1 [C555] passed in 5s',
+                comment: 'Step 1 @C555 passed in 5s',
                 elapsed: '5s',
                 status_id: 1
             },

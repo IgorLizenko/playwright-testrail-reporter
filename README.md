@@ -102,19 +102,46 @@ test('complex feature with multiple cases from multiple projects', { tag: ['@101
 
 ### Tagging Test Steps
 
-Tag your steps with TestRail case ID (might include prefix) in brackets.
+Tag your test step titles with TestRail case ID (might include prefix) with `@`.
 
 Example
 ```typescript
 import { test } from '@playwright/test';
 
 test('simple test matching one case', { tag: ['@101-204-555', '@101-204-556'] }, async ({ page }) => {
-  await test.step('Step 1 [555]', async () => {
+  await test.step('Step 1 @555', async () => {
     // Your step code
   });
 
-  await test.step('Step 2 [R556]', async () => {
+  await test.step('Step 2 @556', async () => {
     // Your step code
+  });
+});
+```
+
+#### Rules Regarding Tagged Steps
+
+The main benefit of using tagged steps is for longer E2E tests to correctly mark passed steps in TestRail if the test fails on a later stage in Playwright.
+
+- If a test contains some valid tags, tagged steps should use the same case IDs
+- If a step does not contain a valid TestRail case ID, it will be ignored by reporter
+- If a step contains a valid TestRail case ID and it passed, the corresponding TestRail case will be marked as passed
+- If a step contains a valid TestRail case ID and it fails, the corresponding TestRail case will get the same status and comment as if step did not fail
+
+Avoid situation where all tags are matched to test steps, but some steps are not tagged. If such situation occurs and the test fails, the reporter might miss the failed step and mark the test as passed in TestRail. Consider either adding tags to all steps or make sure that some tags are not matched to test steps.
+
+#### ❌ Incorrect usage:
+
+```typescript
+import { test } from '@playwright/test';
+
+test('simple test matching one case', { tag: ['@101-204-555'] }, async ({ page }) => {
+  await test.step('Step 1 @555', async () => {
+    // This step will be marked as passed in TestRail
+  });
+
+  await test.step('Step 2', async () => {
+    throw new Error('TestRail will not know about this failure')
   });
 });
 ```
@@ -133,7 +160,7 @@ Your test results will be automatically sent to TestRail.
 
 If you want to have more detailed logs, consider setting `TESTRAIL_REPORTER_DEBUG_MODE` environment variable to `true`.
 
-## Additional information
+## Additional Information
 
 #### Graceful Failure Logic
 

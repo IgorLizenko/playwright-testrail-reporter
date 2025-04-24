@@ -3,7 +3,7 @@ import type { TestCase } from '@playwright/test/reporter';
 import type { ParsedTag, ProjectSuiteCombo } from '@types-internal/playwright-reporter.types';
 
 export const REGEX_TAG_TEST = /(\d+)-(\d+)-\D?(\d+)/;
-export const REGEX_TAG_STEP = /\[\D?(\d+)\]/;
+export const REGEX_TAG_STEP = /@\D?(\d+)/;
 
 /**
  * Parses a single TestRail tag in the format "projectId-suiteId-caseId" or "projectId-suiteId-RcaseId"
