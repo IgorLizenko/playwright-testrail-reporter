@@ -5,7 +5,7 @@ import type { TestCase, TestError, TestResult, TestStep } from '@playwright/test
 import { parseArrayOfTags, parseSingleTag, REGEX_TAG_STEP } from '@reporter/utils/tags';
 
 import type { AttachmentData } from '@types-internal/playwright-reporter.types';
-import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
+import { TestRailCaseStatus, type TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
 

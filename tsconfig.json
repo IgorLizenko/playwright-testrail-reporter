@@ -11,7 +11,6 @@
       "@utils/*": ["src/utils/*"],
       "@test-data": ["test-playwright/test-data.ts"]
     },
-    "outDir": "./lib",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
