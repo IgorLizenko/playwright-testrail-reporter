@@ -1,11 +1,13 @@
 import { stripVTControlCharacters } from 'util';
 
-import type { TestCase, TestError, TestResult } from '@playwright/test/reporter';
+import type { TestCase, TestError, TestResult, TestStep } from '@playwright/test/reporter';
 
-import { parseArrayOfTags, parseSingleTag } from '@reporter/utils/tags';
+import { parseArrayOfTags, parseSingleTag, REGEX_TAG_STEP } from '@reporter/utils/tags';
 
 import type { AttachmentData } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseStatus, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
+
+import logger from '@logger';
 
 function formatMilliseconds(ms: number): string {
     const seconds = Math.ceil(ms / 1000);
@@ -95,6 +97,36 @@ function generateTestComment(testCase: TestCase, testResult: TestResult): string
 }
 
 /**
+ * Updates test results based on test steps by matching TestRail case IDs.
+ * For each non-errored test step that contains a valid TestRail case ID, marks the corresponding test result as passed.
+ *
+ * @param {TestRailPayloadUpdateRunResult[]} arrayTestResults - Array of test results to be updated
+ * @param {TestStep[]} testSteps - Array of test steps to process
+ * @returns {TestRailPayloadUpdateRunResult[]} Updated array of test results with modified status_id values
+ */
+function alterTestResultsFromSteps(arrayTestResults: TestRailPayloadUpdateRunResult[], testSteps: TestStep[]): TestRailPayloadUpdateRunResult[] {
+    const updatedResults = structuredClone(arrayTestResults);
+
+    for (const testStep of testSteps) {
+        const parsedCaseId = REGEX_TAG_STEP.exec(testStep.title)?.[1];
+
+        if (!parsedCaseId) {
+            continue;
+        }
+
+        const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === Number(parsedCaseId));
+
+        if (matchingTestResult) {
+            matchingTestResult.status_id = TestRailCaseStatus.passed;
+        } else {
+            logger.error(`Test step contains invalid TestRail case ID: ${parsedCaseId}`);
+        }
+    }
+
+    return updatedResults;
+}
+
+/**
  * Converts Playwright test results to TestRail case results.
  * @param params Object containing test case and result information
  * @param params.testCase Playwright test case containing tags with TestRail case IDs
@@ -114,8 +146,10 @@ function convertTestResult({
 }): TestRailPayloadUpdateRunResult[] {
     const parsedTags = parseArrayOfTags(testCase.tags);
 
+    let results: TestRailPayloadUpdateRunResult[] = [];
+
     if (parsedTags) {
-        return parsedTags.map((tag) => (
+        results = parsedTags.map((tag) => (
             tag.arrayCaseIds.map((caseId) => ({
                 case_id: caseId,
                 status_id: convertTestStatus(testResult.status),
@@ -123,9 +157,16 @@ function convertTestResult({
                 elapsed: formatMilliseconds(testResult.duration)
             }))
         )).flat();
+
+        const arrayTaggedSteps = testResult.steps
+            .filter((step) => step.category === 'test.step' && step.title.match(REGEX_TAG_STEP));
+
+        if (arrayTaggedSteps.length > 0) {
+            results = alterTestResultsFromSteps(results, arrayTaggedSteps);
+        }
     }
 
-    return [];
+    return results;
 }
 
 /**

@@ -2,6 +2,9 @@ import type { TestCase } from '@playwright/test/reporter';
 
 import type { ParsedTag, ProjectSuiteCombo } from '@types-internal/playwright-reporter.types';
 
+export const REGEX_TAG_TEST = /(\d+)-(\d+)-\D?(\d+)/;
+export const REGEX_TAG_STEP = /\[(\d+)\]/;
+
 /**
  * Parses a single TestRail tag in the format "projectId-suiteId-caseId" or "projectId-suiteId-RcaseId"
  * where R is any non-digit character
@@ -13,9 +16,7 @@ import type { ParsedTag, ProjectSuiteCombo } from '@types-internal/playwright-re
  * parseSingleTag("123-456-R789") // returns { projectId: 123, suiteId: 456, caseId: 789 }
  */
 export function parseSingleTag(tag: TestCase['tags'][number]): ParsedTag | null {
-    const regex = /(\d+)-(\d+)-\D?(\d+)/;
-
-    const match = regex.exec(tag);
+    const match = REGEX_TAG_TEST.exec(tag);
 
     if (match) {
         return {

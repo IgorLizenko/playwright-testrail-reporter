@@ -7,9 +7,8 @@
       "@types-internal/*": ["src/types/*"],
       "@testrail-api/*": ["src/testrail-api/*"],
       "@reporter/*": ["src/reporter/*"],
-      "@utils/*": ["src/utils/*"],
       "@logger": ["src/utils/logger.ts"],
-      "@utils/logger": ["@logger"],
+      "@utils/*": ["src/utils/*"],
       "@test-data": ["test-playwright/test-data.ts"]
     },
     "outDir": "./lib",
