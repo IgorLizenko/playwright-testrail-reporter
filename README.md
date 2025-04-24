@@ -1,6 +1,6 @@
 [![npm version](https://badge.fury.io/js/playwright-reporter-testrail.svg)](https://badge.fury.io/js/playwright-reporter-testrail)
 
-# Playwright TestRail Reporter with multi project support
+# Playwright TestRail Reporter with Multi-Project Support
 
 A Playwright reporter that integrates with TestRail via API and supports multiple projects and test suites.  
 
@@ -9,8 +9,8 @@ This reporter automatically creates test runs and updates test results in TestRa
 ### Key Features
 
 - 🔄 Multi-project and multi-suite support
-- 🏷️ Test case mapping via tags (e.g., `@101-204-3453`)
-- 🪜 Tagged steps support
+- 🏷️ Test case mapping via tags
+- 🪜 Tagged test steps support
 - 📊 Automatic test run creation and updating
 - 🔍 Comprehensive error reporting
 - 📝 Automatic run closing (optional)
@@ -45,7 +45,8 @@ const config: PlaywrightTestConfig = {
       includeAllCases: false,
       includeAttachments: false,
       closeRuns: false,
-      apiChunkSize: 10
+      apiChunkSize: 10,
+      runNameTemplate: 'Playwright Run ${date}'
     }]
   ]
 };
@@ -59,7 +60,7 @@ export default config;
 - `username`: TestRail email
 - `password`: TestRail password or API key
 - `includeAllCases`: Optional, default `false`, whether to include all cases of the suite to the test run
-- `includeAttachments`**![Beta](https://img.shields.io/badge/status-beta-red)**: Optional, default `false`, whether to include attachments in the test run  
+- `includeAttachments`: Optional, default `false`, whether to include attachments in the test run  
 **❗ Important**: may result in longer execution time.
 - `closeRuns`: Optional, default `false`, whether to close test runs in the end  
 **❗ Important**: ensure that user has permissions to close runs in TestRail
@@ -102,13 +103,15 @@ test('complex feature with multiple cases from multiple projects', { tag: ['@101
 
 ### Tagging Test Steps
 
+Tagging test steps is optional, but is recommended for long E2E tests.
+
 Tag your test step titles with TestRail case ID (might include prefix) with `@`. Test step might contain multiple case IDs.
 
 Example
 ```typescript
 import { test } from '@playwright/test';
 
-test('simple test matching one case', { tag: ['@101-204-555', '@101-204-556', '@101-204-557'] }, async ({ page }) => {
+test('simple test matching three cases', { tag: ['@101-204-555', '@101-204-556', '@101-204-557'] }, async ({ page }) => {
   await test.step('Step 1 @555', async () => {
     // Your step code
   });
@@ -123,12 +126,12 @@ test('simple test matching one case', { tag: ['@101-204-555', '@101-204-556', '@
 
 The main benefit of using tagged steps is for longer E2E tests to correctly mark passed steps in TestRail if the test fails on a later stage in Playwright.
 
-- If a test contains some valid tags, tagged steps should use the same case IDs
+- If a test contains some valid tags, tagged steps should use the same case IDs. Otherwise, the reporter will log an error and ignore those steps
 - If a step does not contain a valid TestRail case ID, it will be ignored by reporter
-- If a step contains a valid TestRail case ID and it passed, the corresponding TestRail case will be marked as passed
-- If a step contains a valid TestRail case ID and it fails, the corresponding TestRail case will get the same status and comment as if step did not fail
+- If a step contains a valid TestRail case ID and it passes, the corresponding TestRail case will be marked as passed regardless of the result of the whole test execution
+- If a step contains a valid TestRail case ID and it fails, the corresponding TestRail case will get the same status and comment as if steps was not tagged
 
-Avoid situation where all tags are matched to test steps, but some steps are not tagged. If such situation occurs and the test fails, the reporter might miss the failed step and mark the test as passed in TestRail. Consider either adding tags to all steps or make sure that some tags are not matched to test steps.
+Avoid situation where all test tags are matched to test steps, but some steps are not tagged. If such situation occurs and the test fails, the reporter might miss the failed step and mark the test as passed in TestRail. Consider either adding tags to all steps or make sure that some tags are not matched to test steps.
 
 #### ❌ Incorrect usage:
 

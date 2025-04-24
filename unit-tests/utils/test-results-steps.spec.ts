@@ -145,29 +145,15 @@ describe('Test results with test steps', () => {
         ]);
     });
 
-    it('Should ignore failed test steps', () => {
-        const testResult = { ...fullTestResult, steps: [testStepFailing], status: 'failed' as const };
-        const testCase = { ...fullTestCase };
-        const results = convertTestResult({ testCase, testResult });
-        expect(results).toEqual([
-            {
-                case_id: 555,
-                comment: 'Basic test failed in 25s:\n\nUnknown error',
-                elapsed: '25s',
-                status_id: 5
-            },
-            {
-                case_id: 444,
-                comment: 'Basic test failed in 25s:\n\nUnknown error',
-                elapsed: '25s',
-                status_id: 5
-            },
-            {
-                case_id: 333,
-                comment: 'Basic test failed in 25s:\n\nUnknown error',
-                elapsed: '25s',
-                status_id: 5
-            }
-        ]);
+    it('Should ignore failed test steps if the whole test fails', () => {
+        const resultsWithSteps = convertTestResult({
+            testCase: { ...fullTestCase },
+            testResult: { ...fullTestResult, steps: [testStepFailing], status: 'failed' as const }
+        });
+        const resultsWithoutSteps = convertTestResult({
+            testCase: { ...fullTestCase },
+            testResult: { ...fullTestResult, status: 'failed' as const }
+        });
+        expect(resultsWithSteps).toEqual(resultsWithoutSteps);
     });
 });
