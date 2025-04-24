@@ -5,10 +5,17 @@ import { convertTestResult } from '@reporter/utils/test-results';
 import logger from '@logger';
 
 jest.mock('@logger', () => ({
-    error: jest.fn()
+    error: jest.fn(),
+    debug: jest.fn()
 }));
 
 describe('Test results with test steps', () => {
+    const testStepRegular = {
+        title: 'Just a step',
+        duration: 5_000,
+        category: 'test.step'
+    } as TestStep;
+
     const testStepNotMatching = {
         title: 'Step 1 [333]',
         duration: 5_000,
@@ -57,6 +64,27 @@ describe('Test results with test steps', () => {
         const testCase = { ...fullTestCase };
         convertTestResult({ testCase, testResult });
         expect(logger.error).toHaveBeenCalledWith('Test step contains invalid TestRail case ID: 333');
+    });
+
+    it('Should log debug message if tagged steps detected', () => {
+        const testResult = { ...fullTestResult, steps: [testStepPassing] };
+        const testCase = { ...fullTestCase };
+        convertTestResult({ testCase, testResult });
+        expect(logger.debug).toHaveBeenCalledWith('Tagged steps detected for Basic test');
+    });
+
+    it('Should not log debug message if no steps are detected', () => {
+        const testResult = { ...fullTestResult };
+        const testCase = { ...fullTestCase };
+        convertTestResult({ testCase, testResult });
+        expect(logger.debug).not.toHaveBeenCalled();
+    });
+
+    it('Should not log debug message if test steps are not tagged', () => {
+        const testResult = { ...fullTestResult, steps: [testStepRegular] };
+        const testCase = { ...fullTestCase };
+        convertTestResult({ testCase, testResult });
+        expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it('Should rewrite passed test results if the whole test fails', () => {

@@ -189,6 +189,7 @@ function convertTestResult({
             .filter((step) => step.category === 'test.step' && step.title.match(REGEX_TAG_STEP));
 
         if (arrayTaggedSteps.length > 0) {
+            logger.debug(`Tagged steps detected for ${testCase.title}`);
             results = alterTestResultsFromSteps(results, arrayTaggedSteps);
         }
     }

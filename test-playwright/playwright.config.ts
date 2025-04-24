@@ -24,7 +24,8 @@ export default defineConfig({
             includeAttachments: true,
             closeRuns: true,
             runNameTemplate: '${suite} Run ${date}'
-        }]
+        }],
+        ['html', { open: 'never' }]
     ],
     use: {
         trace: 'on-first-retry',
