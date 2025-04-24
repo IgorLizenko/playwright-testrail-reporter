@@ -107,15 +107,15 @@ describe('Test results with test steps', () => {
         ]);
     });
 
-    it('Should rewrite failed test results if the whole test fails', () => {
+    it('Should ignore failed test steps', () => {
         const testResult = { ...fullTestResult, steps: [testStepFailing], status: 'failed' as const };
         const testCase = { ...fullTestCase };
         const results = convertTestResult({ testCase, testResult });
         expect(results).toEqual([
             {
                 case_id: 555,
-                comment: 'Step 1 [555] failed in 5s:\n\nStack',
-                elapsed: '5s',
+                comment: 'Basic test failed in 25s:\n\nUnknown error',
+                elapsed: '25s',
                 status_id: 5
             },
             {

@@ -133,15 +133,7 @@ function alterTestResultsFromSteps(arrayTestResults: TestRailPayloadUpdateRunRes
         const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === parsedCaseId);
         const duration = formatMilliseconds(testStep.duration);
 
-        if (matchingTestResult && testStep.error) {
-            matchingTestResult.status_id = TestRailCaseStatus.failed;
-            matchingTestResult.comment = formatFailedMessage({
-                title: testStep.title,
-                duration,
-                errors: [testStep.error]
-            });
-            matchingTestResult.elapsed = duration;
-        } else if (matchingTestResult) {
+        if (matchingTestResult && !testStep.error) {
             matchingTestResult.status_id = TestRailCaseStatus.passed;
             matchingTestResult.comment = formatPassedMessage(testStep.title, duration);
             matchingTestResult.elapsed = duration;
