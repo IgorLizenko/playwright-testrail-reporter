@@ -26,9 +26,9 @@ function formatDate(): string {
 /**
  * Template placeholders for the test run name
  */
-export const TEMPLATE_DATE = '${date}';
-export const TEMPLATE_TIMESTAMP = '${timestamp}';
-export const TEMPLATE_SUITE = '${suite}';
+export const TEMPLATE_DATE = '#{date}';
+export const TEMPLATE_TIMESTAMP = '#{timestamp}';
+export const TEMPLATE_SUITE = '#{suite}';
 
 /**
  * Formats a test run name by replacing template placeholders with actual values

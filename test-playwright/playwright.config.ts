@@ -23,7 +23,7 @@ export default defineConfig({
             includeAllCases: false,
             includeAttachments: true,
             closeRuns: true,
-            runNameTemplate: '${suite} Run ${date}'
+            runNameTemplate: '#{suite} Run #{date}'
         }],
         ['html', { open: 'never' }]
     ],
