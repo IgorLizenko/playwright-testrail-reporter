@@ -130,10 +130,6 @@ function alterTestResultsFromSteps(arrayTestResults: TestRailPayloadUpdateRunRes
     for (const testStep of testSteps) {
         const parsedCaseId = REGEX_TAG_STEP.exec(testStep.title)?.[1];
 
-        if (!parsedCaseId) {
-            continue;
-        }
-
         const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === Number(parsedCaseId));
         const duration = formatMilliseconds(testStep.duration);
 
