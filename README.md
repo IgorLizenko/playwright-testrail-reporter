@@ -102,18 +102,18 @@ test('complex feature with multiple cases from multiple projects', { tag: ['@101
 
 ### Tagging Test Steps
 
-Tag your test step titles with TestRail case ID (might include prefix) with `@`.
+Tag your test step titles with TestRail case ID (might include prefix) with `@`. Test step might contain multiple case IDs.
 
 Example
 ```typescript
 import { test } from '@playwright/test';
 
-test('simple test matching one case', { tag: ['@101-204-555', '@101-204-556'] }, async ({ page }) => {
+test('simple test matching one case', { tag: ['@101-204-555', '@101-204-556', '@101-204-557'] }, async ({ page }) => {
   await test.step('Step 1 @555', async () => {
     // Your step code
   });
 
-  await test.step('Step 2 @556', async () => {
+  await test.step('Step 2 @556 @R557', async () => {
     // Your step code
   });
 });

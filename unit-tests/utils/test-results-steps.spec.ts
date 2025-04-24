@@ -17,7 +17,7 @@ describe('Test results with test steps', () => {
     } as TestStep;
 
     const testStepNotMatching = {
-        title: 'Step 1 @R333',
+        title: 'Step 1 @R99999',
         duration: 5_000,
         category: 'test.step'
     } as TestStep;
@@ -33,6 +33,12 @@ describe('Test results with test steps', () => {
         duration: 5_000,
         category: 'test.step',
         error: { message: 'Custom error', stack: 'Stack' }
+    } as TestStep;
+
+    const testStepMultitag = {
+        title: 'Step 1 @555 @444',
+        duration: 5_000,
+        category: 'test.step'
     } as TestStep;
 
     const fullTestResult: TestResult = {
@@ -52,7 +58,7 @@ describe('Test results with test steps', () => {
 
     const fullTestCase: TestCase = {
         title: 'Basic test',
-        tags: ['@111-222-555', '@111-222-444']
+        tags: ['@111-222-555', '@111-222-444', '@111-222-333']
     } as TestCase;
 
     beforeEach(() => {
@@ -63,7 +69,7 @@ describe('Test results with test steps', () => {
         const testResult = { ...fullTestResult, steps: [testStepNotMatching] };
         const testCase = { ...fullTestCase };
         convertTestResult({ testCase, testResult });
-        expect(logger.error).toHaveBeenCalledWith('Test step contains invalid TestRail case ID: 333');
+        expect(logger.error).toHaveBeenCalledWith('Test step contains invalid TestRail case ID: 99999');
     });
 
     it('Should log debug message if tagged steps detected', () => {
@@ -103,6 +109,38 @@ describe('Test results with test steps', () => {
                 comment: 'Basic test failed in 25s:\n\nUnknown error',
                 elapsed: '25s',
                 status_id: 5
+            },
+            {
+                case_id: 333,
+                comment: 'Basic test failed in 25s:\n\nUnknown error',
+                elapsed: '25s',
+                status_id: 5
+            }
+        ]);
+    });
+
+    it('Should rewrite passed test results for steps with multiple tags', () => {
+        const testResult = { ...fullTestResult, steps: [testStepMultitag], status: 'failed' as const };
+        const testCase = { ...fullTestCase };
+        const results = convertTestResult({ testCase, testResult });
+        expect(results).toEqual([
+            {
+                case_id: 555,
+                comment: 'Basic test (Step 1 @555 @444) passed in 5s',
+                elapsed: '5s',
+                status_id: 1
+            },
+            {
+                case_id: 444,
+                comment: 'Basic test (Step 1 @555 @444) passed in 5s',
+                elapsed: '5s',
+                status_id: 1
+            },
+            {
+                case_id: 333,
+                comment: 'Basic test failed in 25s:\n\nUnknown error',
+                elapsed: '25s',
+                status_id: 5
             }
         ]);
     });
@@ -120,6 +158,12 @@ describe('Test results with test steps', () => {
             },
             {
                 case_id: 444,
+                comment: 'Basic test failed in 25s:\n\nUnknown error',
+                elapsed: '25s',
+                status_id: 5
+            },
+            {
+                case_id: 333,
                 comment: 'Basic test failed in 25s:\n\nUnknown error',
                 elapsed: '25s',
                 status_id: 5

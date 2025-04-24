@@ -136,17 +136,21 @@ function alterTestResultsFromSteps({
     const updatedResults = structuredClone(arrayTestResults);
 
     for (const testStep of arrayTestSteps) {
-        const parsedCaseId = parseInt(REGEX_TAG_STEP.exec(testStep.title)![1]);
+        const arrayMatchingCaseIds = testStep.title.matchAll(REGEX_TAG_STEP);
 
-        const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === parsedCaseId);
-        const duration = formatMilliseconds(testStep.duration);
+        for (const regexResult of arrayMatchingCaseIds) {
+            const parsedCaseId = parseInt(regexResult[1]);
 
-        if (matchingTestResult && !testStep.error) {
-            matchingTestResult.status_id = TestRailCaseStatus.passed;
-            matchingTestResult.comment = formatPassedMessage(`${testName} (${testStep.title})`, duration);
-            matchingTestResult.elapsed = duration;
-        } else {
-            logger.error(`Test step contains invalid TestRail case ID: ${parsedCaseId}`);
+            const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === parsedCaseId);
+            const duration = formatMilliseconds(testStep.duration);
+
+            if (matchingTestResult && !testStep.error) {
+                matchingTestResult.status_id = TestRailCaseStatus.passed;
+                matchingTestResult.comment = formatPassedMessage(`${testName} (${testStep.title})`, duration);
+                matchingTestResult.elapsed = duration;
+            } else {
+                logger.error(`Test step contains invalid TestRail case ID: ${parsedCaseId}`);
+            }
         }
     }
 
