@@ -94,7 +94,7 @@ describe('Test results with test steps', () => {
         expect(results).toEqual([
             {
                 case_id: 555,
-                comment: 'Step 1 @C555 passed in 5s',
+                comment: 'Basic test (Step 1 @C555) passed in 5s',
                 elapsed: '5s',
                 status_id: 1
             },

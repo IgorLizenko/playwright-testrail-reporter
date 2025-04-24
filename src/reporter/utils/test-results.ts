@@ -124,10 +124,18 @@ function generateTestComment(testCase: TestCase, testResult: TestResult): string
  * @param {TestStep[]} testSteps - Array of test steps to process
  * @returns {TestRailPayloadUpdateRunResult[]} Updated array of test results with modified status_id values
  */
-function alterTestResultsFromSteps(arrayTestResults: TestRailPayloadUpdateRunResult[], testSteps: TestStep[]): TestRailPayloadUpdateRunResult[] {
+function alterTestResultsFromSteps({
+    arrayTestResults,
+    arrayTestSteps,
+    testName
+}: {
+    arrayTestResults: TestRailPayloadUpdateRunResult[],
+    arrayTestSteps: TestStep[],
+    testName: TestCase['title']
+}): TestRailPayloadUpdateRunResult[] {
     const updatedResults = structuredClone(arrayTestResults);
 
-    for (const testStep of testSteps) {
+    for (const testStep of arrayTestSteps) {
         const parsedCaseId = parseInt(REGEX_TAG_STEP.exec(testStep.title)![1]);
 
         const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === parsedCaseId);
@@ -135,7 +143,7 @@ function alterTestResultsFromSteps(arrayTestResults: TestRailPayloadUpdateRunRes
 
         if (matchingTestResult && !testStep.error) {
             matchingTestResult.status_id = TestRailCaseStatus.passed;
-            matchingTestResult.comment = formatPassedMessage(testStep.title, duration);
+            matchingTestResult.comment = formatPassedMessage(`${testName} (${testStep.title})`, duration);
             matchingTestResult.elapsed = duration;
         } else {
             logger.error(`Test step contains invalid TestRail case ID: ${parsedCaseId}`);
@@ -165,10 +173,10 @@ function convertTestResult({
 }): TestRailPayloadUpdateRunResult[] {
     const parsedTags = parseArrayOfTags(testCase.tags);
 
-    let results: TestRailPayloadUpdateRunResult[] = [];
+    let arrayTestResults: TestRailPayloadUpdateRunResult[] = [];
 
     if (parsedTags) {
-        results = parsedTags.map((tag) => (
+        arrayTestResults = parsedTags.map((tag) => (
             tag.arrayCaseIds.map((caseId) => ({
                 case_id: caseId,
                 status_id: convertTestStatus(testResult.status),
@@ -182,11 +190,15 @@ function convertTestResult({
 
         if (arrayTaggedSteps.length > 0) {
             logger.debug(`Tagged steps detected for ${testCase.title}`);
-            results = alterTestResultsFromSteps(results, arrayTaggedSteps);
+            arrayTestResults = alterTestResultsFromSteps({
+                arrayTestResults,
+                arrayTestSteps: arrayTaggedSteps,
+                testName: testCase.title
+            });
         }
     }
 
-    return results;
+    return arrayTestResults;
 }
 
 /**
