@@ -75,4 +75,59 @@ describe('Validate settings tests', () => {
 
         expect(validateSettings(settings)).toBe(false);
     });
+
+    it('Should return false if apiChunkSize is not a number', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            apiChunkSize: '10'
+        } as unknown as ReporterOptions;
+
+        expect(validateSettings(settings)).toBe(false);
+    });
+
+    it('Should return false if closeRuns is not a boolean', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            closeRuns: 'true'
+        } as unknown as ReporterOptions;
+
+        expect(validateSettings(settings)).toBe(false);
+    });
+
+    it('Should return false if includeAllCases is not a boolean', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            includeAllCases: 'true'
+        } as unknown as ReporterOptions;
+
+        expect(validateSettings(settings)).toBe(false);
+    });
+
+    it('Should return false if includeAttachments is not a boolean', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            includeAttachments: 'true'
+        } as unknown as ReporterOptions;
+
+        expect(validateSettings(settings)).toBe(false);
+    });
+
+    it('Should return false if runNameTemplate is not a string', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            runNameTemplate: 123
+        } as unknown as ReporterOptions;
+
+        expect(validateSettings(settings)).toBe(false);
+    });
 });

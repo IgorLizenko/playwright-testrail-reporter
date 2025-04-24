@@ -55,7 +55,7 @@ class TestRailReporter implements Reporter {
         });
     }
 
-    onBegin?(_config: FullConfig, suite: Suite): void {
+    onBegin(_config: FullConfig, suite: Suite): void {
         this.arrayTestRuns = parseArrayOfTags(suite.allTests().map((test) => test.tags).flat());
         logger.debug('Runs to create', this.arrayTestRuns);
 
