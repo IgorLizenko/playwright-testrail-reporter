@@ -128,9 +128,9 @@ function alterTestResultsFromSteps(arrayTestResults: TestRailPayloadUpdateRunRes
     const updatedResults = structuredClone(arrayTestResults);
 
     for (const testStep of testSteps) {
-        const parsedCaseId = REGEX_TAG_STEP.exec(testStep.title)?.[1];
+        const parsedCaseId = parseInt(REGEX_TAG_STEP.exec(testStep.title)![1]);
 
-        const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === Number(parsedCaseId));
+        const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === parsedCaseId);
         const duration = formatMilliseconds(testStep.duration);
 
         if (matchingTestResult && testStep.error) {

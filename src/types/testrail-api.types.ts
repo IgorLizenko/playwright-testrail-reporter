@@ -104,11 +104,9 @@ export type TestRailPayloadCreateRun = {
     includeAllCases?: boolean
 };
 
-export type TestRailPayloadUpdateRunResult = {
+export type TestRailPayloadUpdateRunResult = Pick<TestRailBaseResult, 'status_id' | 'comment'> & {
     case_id: TestRailBaseCase['id'],
-    status_id: TestRailCaseStatus,
     assignedto_id?: TestRailBaseUser['id'],
-    comment: string,
     elapsed?: string,
     environment?: string,
     defects?: string
