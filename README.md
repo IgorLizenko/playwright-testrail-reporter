@@ -10,9 +10,10 @@ This reporter automatically creates test runs and updates test results in TestRa
 
 - 🔄 Multi-project and multi-suite support
 - 🏷️ Test case mapping via tags (e.g., `@101-204-3453`)
+- 🪜 Tagged steps support
 - 📊 Automatic test run creation and updating
-- 📝 Automatic run closing (optional)
 - 🔍 Comprehensive error reporting
+- 📝 Automatic run closing (optional)
 - 🖼️ Attachment support (optional)
 
 ## Setup
@@ -82,20 +83,39 @@ Tag your tests with TestRail case IDs using the following format:
 Where:
 - `project_id`: TestRail project ID
 - `suite_id`: TestRail test suite ID
-- `case_id`: TestRail test case ID
+- `case_id`: TestRail test case ID (might include prefix)
 
 Example:
 
 ```typescript
 import { test } from '@playwright/test';
 
-test('simple test matching one case', { tag: ['@101-204-3453'] }, async ({ page }) => {
+test('simple test matching one case', { tag: ['@101-204-R3453'] }, async ({ page }) => {
   // Your test code
 });
 
 // Multiple test cases
 test('complex feature with multiple cases from multiple projects', { tag: ['@101-204-3453', '@203-305-4567'] }, async ({ page }) => {
   // Your test code
+});
+```
+
+### Tagging Test Steps
+
+Tag your steps with TestRail case ID (might include prefix) in brackets.
+
+Example
+```typescript
+import { test } from '@playwright/test';
+
+test('simple test matching one case', { tag: ['@101-204-555', '@101-204-556'] }, async ({ page }) => {
+  await test.step('Step 1 [555]', async () => {
+    // Your step code
+  });
+
+  await test.step('Step 2 [R556]', async () => {
+    // Your step code
+  });
 });
 ```
 
@@ -134,7 +154,7 @@ If you have multiple Playwright tests that match the same TestRail case, the rep
 1. If all Playwright tests finish with the same status, the TestRail case will be marked with that status, and the comment (and error in case of fail) will be generated from the first test that finished.
 2. If any Playwright tests finish with different statuses, the reporter will prioritize the following statuses in order: passed, failed, blocked, untested.
 
-#### Know Issues
+#### Known Issues
 
 When several Playwright tests match the same TestRail case, each test will upload its attachments to the TestRail case. This may result in duplicate attachments.
 
