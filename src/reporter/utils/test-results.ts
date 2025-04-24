@@ -117,7 +117,11 @@ function alterTestResultsFromSteps(arrayTestResults: TestRailPayloadUpdateRunRes
         const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === Number(parsedCaseId));
 
         if (matchingTestResult) {
+            const duration = formatMilliseconds(testStep.duration);
+
             matchingTestResult.status_id = TestRailCaseStatus.passed;
+            matchingTestResult.comment = `${testStep.title} passed in ${duration}`;
+            matchingTestResult.elapsed = duration;
         } else {
             logger.error(`Test step contains invalid TestRail case ID: ${parsedCaseId}`);
         }
