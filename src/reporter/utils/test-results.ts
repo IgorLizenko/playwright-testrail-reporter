@@ -66,6 +66,22 @@ function formatErrorMessage(arrayErrors: TestResult['errors']): string {
     }).join('\n\n');
 }
 
+function formatPassedMessage(title: string, duration: string): string {
+    return `${title} passed in ${duration}`;
+}
+
+function formatFailedMessage({
+    title,
+    duration,
+    errors
+}: {
+    title: string,
+    duration: string,
+    errors: TestError[]
+}): string {
+    return `${title} failed in ${duration}:\n\n${formatErrorMessage(errors)}`;
+}
+
 /**
  * Generates a comment string based on the Playwright test result.
  * @param testResult The Playwright test result object.
@@ -78,15 +94,19 @@ function formatErrorMessage(arrayErrors: TestResult['errors']): string {
  * - unknown: "Test finished with unknown status"
  */
 function generateTestComment(testCase: TestCase, testResult: TestResult): string {
-    const durationString = formatMilliseconds(testResult.duration);
+    const duration = formatMilliseconds(testResult.duration);
 
     switch (testResult.status) {
         case 'passed':
-            return `${testCase.title} passed in ${durationString}`;
+            return formatPassedMessage(testCase.title, duration);
         case 'failed':
-            return `${testCase.title} failed\n\n${formatErrorMessage(testResult.errors)}`;
+            return formatFailedMessage({
+                title: testCase.title,
+                duration,
+                errors: testResult.errors
+            });
         case 'timedOut':
-            return `${testCase.title} timed out in ${durationString}`;
+            return `${testCase.title} timed out in ${duration}`;
         case 'interrupted':
             return `${testCase.title} interrupted`;
         case 'skipped':
@@ -115,12 +135,19 @@ function alterTestResultsFromSteps(arrayTestResults: TestRailPayloadUpdateRunRes
         }
 
         const matchingTestResult = updatedResults.find((testResult) => testResult.case_id === Number(parsedCaseId));
+        const duration = formatMilliseconds(testStep.duration);
 
-        if (matchingTestResult) {
-            const duration = formatMilliseconds(testStep.duration);
-
+        if (matchingTestResult && testStep.error) {
+            matchingTestResult.status_id = TestRailCaseStatus.failed;
+            matchingTestResult.comment = formatFailedMessage({
+                title: testStep.title,
+                duration,
+                errors: [testStep.error]
+            });
+            matchingTestResult.elapsed = duration;
+        } else if (matchingTestResult) {
             matchingTestResult.status_id = TestRailCaseStatus.passed;
-            matchingTestResult.comment = `${testStep.title} passed in ${duration}`;
+            matchingTestResult.comment = formatPassedMessage(testStep.title, duration);
             matchingTestResult.elapsed = duration;
         } else {
             logger.error(`Test step contains invalid TestRail case ID: ${parsedCaseId}`);
