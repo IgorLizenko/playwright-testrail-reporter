@@ -46,7 +46,7 @@ const config: PlaywrightTestConfig = {
       includeAttachments: false,
       closeRuns: false,
       apiChunkSize: 10,
-      runNameTemplate: 'Playwright Run ${date}'
+      runNameTemplate: 'Playwright Run #{date}'
     }]
   ]
 };
@@ -65,7 +65,7 @@ export default config;
 - `closeRuns`: Optional, default `false`, whether to close test runs in the end  
 **❗ Important**: ensure that user has permissions to close runs in TestRail
 - `apiChunkSize`: Optional, default `10`, the number of requests to send in parallel to TestRail API
-- `runNameTemplate`: Optional, default `Playwright Run ${date}`, the template for the run name
+- `runNameTemplate`: Optional, default `Playwright Run #{date}`, the template for the run name
 
 #### Run Name Template Options
 - `#{date}`: The current date and time in `YYYY/MM/DD HH:MM:SS UTC` format (e.g. `2025/04/22 14:27:58 UTC`)
