@@ -175,7 +175,7 @@ describe('Group runs unit tests', () => {
             });
         });
 
-        it('Shoule leave the first passed case result for multiple cases with different statuses', () => {
+        it('Should leave the first passed case result for multiple cases with different statuses', () => {
             const finalResult: FinalResult = {
                 runId: 1000,
                 arrayCaseResults: [
