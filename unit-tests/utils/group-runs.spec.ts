@@ -175,6 +175,27 @@ describe('Group runs unit tests', () => {
             });
         });
 
+        it('Shoule leave the first passed case result for multiple cases with different statuses', () => {
+            const finalResult: FinalResult = {
+                runId: 1000,
+                arrayCaseResults: [
+                    { case_id: 1, status_id: TestRailCaseStatus.failed, comment: 'Test 1 - Failed' },
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Passed' },
+                    { case_id: 1, status_id: TestRailCaseStatus.blocked, comment: 'Test 1 - Blocked' },
+                    { case_id: 1, status_id: TestRailCaseStatus.untested, comment: 'Test 1 - Untested' },
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Passed Two' },
+                    { case_id: 1, status_id: TestRailCaseStatus.blocked, comment: 'Test 1 - Blocked Two' }
+                ]
+            };
+
+            expect(filterDuplicatingCases(finalResult)).toEqual({
+                runId: 1000,
+                arrayCaseResults: [
+                    { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1 - Passed' }
+                ]
+            });
+        });
+
         it('Should filter out cases based on status priority', () => {
             const finalResult: FinalResult = {
                 runId: 1000,
