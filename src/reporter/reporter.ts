@@ -31,6 +31,14 @@ class TestRailReporter implements Reporter {
     private readonly chunkSize: number;
     private readonly runNameTemplate: string;
 
+    private readonly defaultSettings = {
+        includeAllCases: false,
+        includeAttachments: false,
+        closeRuns: false,
+        apiChunkSize: 10,
+        runNameTemplate: `Playwright Run ${TEMPLATE_DATE}`
+    };
+
     constructor(options: ReporterOptions) {
         this.isSetupCorrectly = validateSettings(options);
         logger.debug('Setting up TestRail API client');
@@ -41,16 +49,17 @@ class TestRailReporter implements Reporter {
         this.arrayTestRuns = null;
 
         // Remember reporter options as 'options' object is not accessible after constructor
-        this.includeAllCases = options.includeAllCases ?? false;
-        this.includeAttachments = options.includeAttachments ?? false;
-        this.closeRuns = options.closeRuns ?? false;
-        this.chunkSize = options.apiChunkSize ?? 10;
-        this.runNameTemplate = options.runNameTemplate ?? `Playwright Run ${TEMPLATE_DATE}`;
+        this.includeAllCases = options.includeAllCases ?? this.defaultSettings.includeAllCases;
+        this.includeAttachments = options.includeAttachments ?? this.defaultSettings.includeAttachments;
+        this.closeRuns = options.closeRuns ?? this.defaultSettings.closeRuns;
+        this.chunkSize = options.apiChunkSize ?? this.defaultSettings.apiChunkSize;
+        this.runNameTemplate = options.runNameTemplate ?? this.defaultSettings.runNameTemplate;
 
         logger.debug('Reporter options', {
             includeAllCases: this.includeAllCases,
             includeAttachments: this.includeAttachments,
             closeRuns: this.closeRuns,
+            chunkSize: this.chunkSize,
             runNameTemplate: this.runNameTemplate
         });
     }
@@ -121,7 +130,6 @@ class TestRailReporter implements Reporter {
 
         if (!this.arrayTestRuns) {
             logger.warn('No test runs to create due to absence of tags in expected format');
-
             return false;
         }
 
@@ -170,9 +178,8 @@ class TestRailReporter implements Reporter {
     }
 
     private compileFinalResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
-        return groupTestResults(arrayTestResults, arrayTestRuns).map((finalResult) => {
-            return filterDuplicatingCases(finalResult);
-        });
+        const arrayAllResults = groupTestResults(arrayTestResults, arrayTestRuns);
+        return arrayAllResults.map((finalResult) => filterDuplicatingCases(finalResult));
     }
 
     private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<CaseResultMatch[]> {

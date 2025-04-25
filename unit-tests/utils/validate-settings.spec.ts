@@ -76,7 +76,7 @@ describe('Validate settings tests', () => {
         expect(validateSettings(settings)).toBe(false);
     });
 
-    it('Should return false if apiChunkSize is not a number', () => {
+    it('Should log an error and return false if apiChunkSize is not a number', () => {
         const settings = {
             domain: 'https://testrail.com',
             username: 'username',
@@ -84,10 +84,51 @@ describe('Validate settings tests', () => {
             apiChunkSize: '10'
         } as unknown as ReporterOptions;
 
-        expect(validateSettings(settings)).toBe(false);
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith('apiChunkSize must be an integer greater than 0');
+        expect(result).toBe(false);
     });
 
-    it('Should return false if closeRuns is not a boolean', () => {
+    it('Should log an error and return false if apiChunkSize is not an integer', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            apiChunkSize: 10.5
+        } as unknown as ReporterOptions;
+
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith('apiChunkSize must be an integer greater than 0');
+        expect(result).toBe(false);
+    });
+
+    it('Should log an error and return false if apiChunkSize is zero', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            apiChunkSize: 0
+        } as unknown as ReporterOptions;
+
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith('apiChunkSize must be an integer greater than 0');
+        expect(result).toBe(false);
+    });
+
+    it('Should log an error and return false if apiChunkSize is less than 1', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            apiChunkSize: -10
+        } as unknown as ReporterOptions;
+
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith('apiChunkSize must be an integer greater than 0');
+        expect(result).toBe(false);
+    });
+
+    it('Should log an error and return false if closeRuns is not a boolean', () => {
         const settings = {
             domain: 'https://testrail.com',
             username: 'username',
@@ -95,10 +136,12 @@ describe('Validate settings tests', () => {
             closeRuns: 'true'
         } as unknown as ReporterOptions;
 
-        expect(validateSettings(settings)).toBe(false);
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith('closeRuns must be a boolean');
+        expect(result).toBe(false);
     });
 
-    it('Should return false if includeAllCases is not a boolean', () => {
+    it('Should log an error and return false if includeAllCases is not a boolean', () => {
         const settings = {
             domain: 'https://testrail.com',
             username: 'username',
@@ -106,10 +149,12 @@ describe('Validate settings tests', () => {
             includeAllCases: 'true'
         } as unknown as ReporterOptions;
 
-        expect(validateSettings(settings)).toBe(false);
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith('includeAllCases must be a boolean');
+        expect(result).toBe(false);
     });
 
-    it('Should return false if includeAttachments is not a boolean', () => {
+    it('Should log an error and return false if includeAttachments is not a boolean', () => {
         const settings = {
             domain: 'https://testrail.com',
             username: 'username',
@@ -117,10 +162,12 @@ describe('Validate settings tests', () => {
             includeAttachments: 'true'
         } as unknown as ReporterOptions;
 
-        expect(validateSettings(settings)).toBe(false);
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith('includeAttachments must be a boolean');
+        expect(result).toBe(false);
     });
 
-    it('Should return false if runNameTemplate is not a string', () => {
+    it('Should log an error and return false if runNameTemplate is not a string', () => {
         const settings = {
             domain: 'https://testrail.com',
             username: 'username',
@@ -128,6 +175,8 @@ describe('Validate settings tests', () => {
             runNameTemplate: 123
         } as unknown as ReporterOptions;
 
-        expect(validateSettings(settings)).toBe(false);
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith('runNameTemplate must be a string');
+        expect(result).toBe(false);
     });
 });

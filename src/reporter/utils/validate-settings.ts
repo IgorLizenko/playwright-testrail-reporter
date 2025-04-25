@@ -22,27 +22,27 @@ export function validateSettings(options: ReporterOptions): boolean {
         return false;
     }
 
-    if (options.apiChunkSize && typeof options.apiChunkSize !== 'number') {
-        logger.error('apiChunkSize must be a number');
+    if ('apiChunkSize' in options && (!Number.isInteger(options.apiChunkSize) || options.apiChunkSize! < 1)) {
+        logger.error('apiChunkSize must be an integer greater than 0');
         return false;
     }
 
-    if (options.closeRuns && typeof options.closeRuns !== 'boolean') {
+    if ('closeRuns' in options && typeof options.closeRuns !== 'boolean') {
         logger.error('closeRuns must be a boolean');
         return false;
     }
 
-    if (options.includeAllCases && typeof options.includeAllCases !== 'boolean') {
+    if ('includeAllCases' in options && typeof options.includeAllCases !== 'boolean') {
         logger.error('includeAllCases must be a boolean');
         return false;
     }
 
-    if (options.includeAttachments && typeof options.includeAttachments !== 'boolean') {
+    if ('includeAttachments' in options && typeof options.includeAttachments !== 'boolean') {
         logger.error('includeAttachments must be a boolean');
         return false;
     }
 
-    if (options.runNameTemplate && typeof options.runNameTemplate !== 'string') {
+    if ('runNameTemplate' in options && typeof options.runNameTemplate !== 'string') {
         logger.error('runNameTemplate must be a string');
         return false;
     }
