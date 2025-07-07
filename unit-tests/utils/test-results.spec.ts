@@ -52,6 +52,19 @@ describe('Generate test result based on Playwright TestCase and TestResult', () 
         ]);
     });
 
+    it('Should convert a zero second test correctly', () => {
+        const testResult = { ...fullTestResult, duration: 0 };
+        const testCase = { ...fullTestCase };
+        expect(convertTestResult({ testCase, testResult })).toEqual([
+            {
+                case_id: 333,
+                status_id: TestRailCaseStatus.passed,
+                comment: 'Basic test passed in 1s',
+                elapsed: '1s'
+            }
+        ]);
+    });
+
     it('Should return empty array if test has no tags', () => {
         const testCase = { ...fullTestCase, tags: [] };
         const testResult = { ...fullTestResult };
