@@ -17,7 +17,8 @@ describe('Generate test result based on Playwright TestCase and TestResult', () 
         stderr: [],
         steps: [],
         workerIndex: 0,
-        parallelIndex: 0
+        parallelIndex: 0,
+        annotations: []
     };
 
     const fullTestCase: TestCase = {
@@ -47,6 +48,19 @@ describe('Generate test result based on Playwright TestCase and TestResult', () 
                 status_id: TestRailCaseStatus.passed,
                 comment: 'Basic test passed in 12m 0s',
                 elapsed: '12m 0s'
+            }
+        ]);
+    });
+
+    it('Should convert a zero second test correctly', () => {
+        const testResult = { ...fullTestResult, duration: 0 };
+        const testCase = { ...fullTestCase };
+        expect(convertTestResult({ testCase, testResult })).toEqual([
+            {
+                case_id: 333,
+                status_id: TestRailCaseStatus.passed,
+                comment: 'Basic test passed in 1s',
+                elapsed: '1s'
             }
         ]);
     });

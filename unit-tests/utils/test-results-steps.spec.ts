@@ -53,7 +53,8 @@ describe('Test results with test steps', () => {
         stderr: [],
         steps: [],
         workerIndex: 0,
-        parallelIndex: 0
+        parallelIndex: 0,
+        annotations: []
     };
 
     const fullTestCase: TestCase = {
