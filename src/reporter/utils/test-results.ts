@@ -15,7 +15,10 @@ import logger from '@logger';
  * @returns A formatted string in the format "Xs" for durations under 1 minute, or "Xm Ys" for durations over 1 minute
  */
 function formatMilliseconds(ms: number): string {
-    const seconds = Math.ceil(ms / 1000);
+    // Round up to 1 second if test duration is 0
+    const millisecondsToUse = ms || 1;
+
+    const seconds = Math.ceil(millisecondsToUse / 1000);
 
     if (seconds < 60) {
         return `${seconds}s`;
