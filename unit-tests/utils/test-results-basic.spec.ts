@@ -45,7 +45,8 @@ describe('Test results basic unit tests', function () {
             stderr: [],
             steps: [],
             workerIndex: 0,
-            parallelIndex: 0
+            parallelIndex: 0,
+            annotations: []
         };
 
         const testCase = {

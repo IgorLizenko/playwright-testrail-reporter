@@ -17,7 +17,8 @@ describe('Generate test result based on Playwright TestCase and TestResult', () 
         stderr: [],
         steps: [],
         workerIndex: 0,
-        parallelIndex: 0
+        parallelIndex: 0,
+        annotations: []
     };
 
     const fullTestCase: TestCase = {
