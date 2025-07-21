@@ -19,10 +19,10 @@ describe('Format test run name', () => {
         expect(result).toMatch(/\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2} UTC/);
     });
 
-    it('Should not format suite name if it is not provided', () => {
+    it('Should format suite name to "All Tests" if it is not provided', () => {
         const template = '#{suite}';
         const result = formatTestRunName(template);
-        expect(result).toBe(template);
+        expect(result).toBe('All Tests');
     });
 
     it('Should format suite name', () => {

@@ -1,3 +1,4 @@
+
 /**
  * Formats the current date and time in UTC using the format YYYY/MM/DD HH:mm:ss UTC
  * @returns {string} Formatted date string
@@ -41,10 +42,7 @@ export function formatTestRunName(template: string, suiteName?: string): string 
 
     result = result.replaceAll(TEMPLATE_DATE, formatDate());
     result = result.replaceAll(TEMPLATE_TIMESTAMP, Date.now().toString());
-
-    if (suiteName) {
-        result = result.replaceAll(TEMPLATE_SUITE, suiteName);
-    }
+    result = result.replaceAll(TEMPLATE_SUITE, suiteName ?? 'All Tests');
 
     return result;
 }
