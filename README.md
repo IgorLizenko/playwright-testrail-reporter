@@ -9,6 +9,7 @@ This reporter automatically creates test runs and updates test results in TestRa
 ### Key Features
 
 - 🔄 Multi-project and multi-suite support
+- 📦 Support for both projects with test suites and projects with a single repository structure
 - 🏷️ Test case mapping via tags
 - 🪜 Tagged test steps support
 - 📊 Automatic test run creation and updating
@@ -71,11 +72,9 @@ Reporter options:
 
 ### Tagging Tests
 
-Tag your tests with TestRail case IDs using the following format:
-- `@<project_id>-<suite_id>-<case_id>`
-Or
-- `@<project_id>-<case_id>`
-For projects with a single repository structure
+Tag your tests with TestRail case IDs in one of the following formats:
+- `@<project_id>-<suite_id>-<case_id>` (for projects with test suites)
+- `@<project_id>-<case_id>` (for projects with a single repository structure)
 
 Where:
 - `project_id`: TestRail project ID
