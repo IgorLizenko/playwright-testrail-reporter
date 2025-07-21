@@ -73,6 +73,9 @@ Reporter options:
 
 Tag your tests with TestRail case IDs using the following format:
 - `@<project_id>-<suite_id>-<case_id>`
+Or
+- `@<project_id>-<case_id>`
+For projects with a single repository structure
 
 Where:
 - `project_id`: TestRail project ID
@@ -90,6 +93,10 @@ test('simple test matching one case', { tag: ['@101-204-R3453'] }, async ({ page
 
 // Multiple test cases
 test('complex feature with multiple cases from multiple projects', { tag: ['@101-204-3453', '@203-305-4567'] }, async ({ page }) => {
+  // Your test code
+});
+
+test('simple test matching one case from single repository structure', { tag: '@110-R999' }, async ({ page }) => {
   // Your test code
 });
 ```
