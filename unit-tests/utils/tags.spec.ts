@@ -34,6 +34,15 @@ describe('Playwright tags parsing', function () {
             const tag = '111-222-XX333';
             expect(parseSingleTag(tag)).toEqual(null);
         });
+
+        it('Should parse a tag without suite ID correctly', function () {
+            const tag = '111-R333';
+            expect(parseSingleTag(tag)).toEqual({
+                projectId: 111,
+                suiteId: null,
+                caseId: 333
+            });
+        });
     });
 
     describe('Test tags parsing', function () {
@@ -104,6 +113,31 @@ describe('Playwright tags parsing', function () {
                     projectId: 333,
                     suiteId: 666,
                     arrayCaseIds: [777]
+                }
+            ]);
+        });
+
+        it('Should group both tags with suiteIds and without', function () {
+            const tags = [
+                '110-222', '110-223',
+                '111-222-333', '111-222-334', '111-222-335',
+                '112-222-444', '112-222-445', '112-222-446'
+            ];
+            expect(parseArrayOfTags(tags)).toEqual([
+                {
+                    projectId: 110,
+                    suiteId: null,
+                    arrayCaseIds: [222, 223]
+                },
+                {
+                    projectId: 111,
+                    suiteId: 222,
+                    arrayCaseIds: [333, 334, 335]
+                },
+                {
+                    projectId: 112,
+                    suiteId: 222,
+                    arrayCaseIds: [444, 445, 446]
                 }
             ]);
         });

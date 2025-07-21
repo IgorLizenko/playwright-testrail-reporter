@@ -15,9 +15,13 @@ const debugProject1suite0case0 = `@111-375-13083`;
 // Either fail or pass
 const debugProject1suite0case1 = `@111-375-13084`;
 
+// No suite project
+const debugProject2case0 = `@118-C26060`;
+
 export {
     debugProject0suite0case0, debugProject0suite0case1,
     debugProject0suite1case0, debugProject0suite1case1, debugProject0suite1case2,
     debugProject0suite2case0, debugProject0suite2case1, debugProject0suite2case2,
-    debugProject1suite0case0, debugProject1suite0case1
+    debugProject1suite0case0, debugProject1suite0case1,
+    debugProject2case0
 };

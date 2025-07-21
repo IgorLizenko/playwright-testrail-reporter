@@ -13,14 +13,14 @@ export type ReporterOptions = {
 
 export type ParsedTag = {
     projectId: TestRailBaseProject['id'],
-    suiteId: TestRailBaseSuite['id'],
+    suiteId: TestRailBaseSuite['id'] | null,
     caseId: TestRailBaseCase['id']
 };
 
 // All cases found in a test run grouped by project and suite IDs
 export type ProjectSuiteCombo = {
     projectId: TestRailBaseProject['id'],
-    suiteId: TestRailBaseSuite['id'],
+    suiteId: TestRailBaseSuite['id'] | null,
     arrayCaseIds: TestRailBaseCase['id'][]
 };
 

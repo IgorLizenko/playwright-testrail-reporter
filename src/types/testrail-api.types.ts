@@ -97,7 +97,7 @@ export type TestRailResponseAttachmentAdded = {
 */
 export type TestRailPayloadCreateRun = {
     projectId: TestRailBaseProject['id'],
-    suiteId: TestRailBaseSuite['id'],
+    suiteId: TestRailBaseSuite['id'] | null,
     name: string,
     description?: string,
     cases: TestRailBaseCase['id'][],
