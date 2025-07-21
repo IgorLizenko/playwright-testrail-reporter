@@ -117,7 +117,7 @@ describe('Playwright tags parsing', function () {
             ]);
         });
 
-        it('Should gtoup both tags with suiteIds and without', function () {
+        it('Should group both tags with suiteIds and without', function () {
             const tags = [
                 '110-222', '110-223',
                 '111-222-333', '111-222-334', '111-222-335',
