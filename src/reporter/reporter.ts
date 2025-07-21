@@ -136,8 +136,8 @@ class TestRailReporter implements Reporter {
         return true;
     }
 
-    private async getSuiteName(suiteId: TestRailBaseSuite['id']): Promise<string | undefined> {
-        return this.runNameTemplate.includes(TEMPLATE_SUITE)
+    private async getSuiteName(suiteId: TestRailBaseSuite['id'] | null): Promise<string | undefined> {
+        return this.runNameTemplate.includes(TEMPLATE_SUITE) && suiteId !== null
             ? (await this.testRailClient.getSuiteInfo(suiteId))?.name
             : undefined;
     }

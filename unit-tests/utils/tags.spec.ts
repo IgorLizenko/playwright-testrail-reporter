@@ -34,6 +34,15 @@ describe('Playwright tags parsing', function () {
             const tag = '111-222-XX333';
             expect(parseSingleTag(tag)).toEqual(null);
         });
+
+        it('Should parse a tag without suite ID correctly', function () {
+            const tag = '111-R333';
+            expect(parseSingleTag(tag)).toEqual({
+                projectId: 111,
+                suiteId: null,
+                caseId: 333
+            });
+        });
     });
 
     describe('Test tags parsing', function () {
