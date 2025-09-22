@@ -238,10 +238,6 @@ class TestRailReporter implements Reporter {
             chunkSize: this.chunkSize
         });
     }
-
-    printsToStdio(): boolean {
-        return true;
-    }
 }
 
 export { TestRailReporter };

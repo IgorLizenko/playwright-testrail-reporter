@@ -16,7 +16,6 @@ export default [
       parserOptions: {
           project: "./tsconfig.json",
             projectService: true,
-            tsconfigRootDir: '',
             allowDefaultProject: true
       }
     },
