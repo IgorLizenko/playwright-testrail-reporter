@@ -12,7 +12,6 @@ vi.mock('@logger', () => {
         default: {
             error: vi.fn(),
             warn: vi.fn()
-
         }
     };
 });

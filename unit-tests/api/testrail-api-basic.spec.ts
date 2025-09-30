@@ -8,7 +8,6 @@ vi.mock('@logger', () => {
     return {
         default: {
             debug: vi.fn()
-
         }
     };
 });
