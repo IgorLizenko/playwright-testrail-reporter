@@ -1,13 +1,18 @@
 import { TestCase, TestResult, TestStep } from '@playwright/test/reporter';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { convertTestResult } from '@reporter/utils/test-results';
 
 import logger from '@logger';
 
-jest.mock('@logger', () => ({
-    error: jest.fn(),
-    debug: jest.fn()
-}));
+vi.mock('@logger', () => {
+    return {
+        default: {
+            error: vi.fn(),
+            debug: vi.fn()
+        }
+    };
+});
 
 describe('Test results with test steps', () => {
     const testStepRegular = {
@@ -63,7 +68,7 @@ describe('Test results with test steps', () => {
     } as TestCase;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('Should log an error is steps do not match case ids', () => {

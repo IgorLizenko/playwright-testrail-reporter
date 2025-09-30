@@ -1,4 +1,5 @@
 import type { TestCase, TestResult } from '@playwright/test/reporter';
+import { describe, expect, it } from 'vitest';
 
 import { convertTestStatus, generateTestComment } from '@reporter/utils/test-results';
 

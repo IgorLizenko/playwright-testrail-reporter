@@ -1,17 +1,23 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { validateSettings } from '@reporter/utils/validate-settings';
 
 import type { ReporterOptions } from '@types-internal/playwright-reporter.types';
 
 import logger from '@logger';
 
-jest.mock('@logger', () => ({
-    error: jest.fn(),
-    warn: jest.fn()
-}));
+vi.mock('@logger', () => {
+    return {
+        default: {
+            error: vi.fn(),
+            warn: vi.fn()
+        }
+    };
+});
 
 describe('Validate settings tests', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('Should return true if settings are set', () => {

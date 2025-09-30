@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 
 import type { AttachmentData, CaseResultMatch, FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
@@ -5,14 +7,18 @@ import { TestRailCaseStatus, type TestRailPayloadUpdateRunResult } from '@types-
 
 import logger from '@logger';
 
-jest.mock('@logger', () => ({
-    error: jest.fn(),
-    warn: jest.fn()
-}));
+vi.mock('@logger', () => {
+    return {
+        default: {
+            error: vi.fn(),
+            warn: vi.fn()
+        }
+    };
+});
 
 describe('Group runs unit tests', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     describe('Group test results', () => {

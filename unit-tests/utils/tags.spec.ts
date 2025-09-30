@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { parseArrayOfTags, parseSingleTag } from '@reporter/utils/tags';
 
 describe('Playwright tags parsing', function () {
