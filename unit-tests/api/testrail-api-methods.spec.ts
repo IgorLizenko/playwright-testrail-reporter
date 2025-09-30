@@ -53,7 +53,12 @@ describe('TestRail API: Main methods tests', () => {
             const result = await client.getSuiteInfo(1);
 
             expect(logger.warn).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith('Failed to retrieve suite info for suite ID 1', expect.any(Error));
+            expect(logger.error).toHaveBeenCalledWith(
+                'Failed to retrieve suite info for suite ID 1',
+                expect.objectContaining({
+                    message: expect.stringContaining('Request failed with status code 403') as string
+                })
+            );
             expect(result).toBeNull();
         });
     });
@@ -87,7 +92,12 @@ describe('TestRail API: Main methods tests', () => {
             });
 
             expect(logger.warn).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith('Failed to create a test run for project 1 and suite 1', expect.any(Error));
+            expect(logger.error).toHaveBeenCalledWith(
+                'Failed to create a test run for project 1 and suite 1',
+                expect.objectContaining({
+                    message: expect.stringContaining('Request failed with status code 403') as string
+                })
+            );
             expect(result).toBeNull();
         });
     });
@@ -109,7 +119,12 @@ describe('TestRail API: Main methods tests', () => {
             const result = await client.addTestRunResults(1, [{ case_id: 1, status_id: 1, comment: 'Test comment' }]);
 
             expect(logger.warn).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith('Failed to add test run results for run ID 1', expect.any(Error));
+            expect(logger.error).toHaveBeenCalledWith(
+                'Failed to add test run results for run ID 1',
+                expect.objectContaining({
+                    message: expect.stringContaining('Request failed with status code 403') as string
+                })
+            );
             expect(result).toBeNull();
         });
     });
@@ -128,7 +143,12 @@ describe('TestRail API: Main methods tests', () => {
             await client.closeTestRun(1);
 
             expect(logger.warn).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith('Failed to close test run for run ID 1', expect.any(Error));
+            expect(logger.error).toHaveBeenCalledWith(
+                'Failed to close test run for run ID 1',
+                expect.objectContaining({
+                    message: expect.stringContaining('Request failed with status code 403') as string
+                })
+            );
         });
     });
 
@@ -155,7 +175,12 @@ describe('TestRail API: Main methods tests', () => {
             });
 
             expect(logger.warn).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith('Failed to add attachment to result 1', expect.any(Error));
+            expect(logger.error).toHaveBeenCalledWith(
+                'Failed to add attachment to result 1',
+                expect.objectContaining({
+                    message: expect.stringContaining('Request failed with status code 403') as string
+                })
+            );
             expect(result).toBeNull();
         });
     });

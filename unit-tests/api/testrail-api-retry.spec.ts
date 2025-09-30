@@ -97,7 +97,12 @@ describe('TestRail API: Retry Logic', () => {
         });
 
         expect(logger.warn).toHaveBeenCalledTimes(3);
-        expect(logger.error).toHaveBeenCalledWith('Failed to create a test run for project 1 and suite 1', expect.any(Error));
+        expect(logger.error).toHaveBeenCalledWith(
+            'Failed to create a test run for project 1 and suite 1',
+            expect.objectContaining({
+                message: expect.stringContaining('Request failed with status code 500') as string
+            })
+        );
     });
 
     it('Should return data and not retry if previous request did not fail', async () => {
@@ -126,6 +131,11 @@ describe('TestRail API: Retry Logic', () => {
         await client.getSuiteInfo(1);
 
         expect(logger.warn).toHaveBeenCalledTimes(3);
-        expect(logger.error).toHaveBeenCalledWith('Failed to retrieve suite info for suite ID 1', expect.any(Error));
+        expect(logger.error).toHaveBeenCalledWith(
+            'Failed to retrieve suite info for suite ID 1',
+            expect.objectContaining({
+                message: expect.stringContaining('Network Error') as string
+            })
+        );
     });
 });
