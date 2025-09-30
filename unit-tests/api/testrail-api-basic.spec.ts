@@ -1,14 +1,21 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { TestRail } from '@testrail-api/testrail-api';
 
 import logger from '@logger';
 
-jest.mock('@logger', () => ({
-    debug: jest.fn()
-}));
+vi.mock('@logger', () => {
+    return {
+        default: {
+            debug: vi.fn()
+
+        }
+    };
+});
 
 describe('TestRail API: Basic (Initialize client)', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('Should initialize client', () => {

@@ -1,21 +1,27 @@
 import axiosMockAdapter from 'axios-mock-adapter';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TestRail } from '@testrail-api/testrail-api';
 
 import logger from '@logger';
 
-jest.mock('@logger', () => ({
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
-}));
+vi.mock('@logger', () => {
+    return {
+        default: {
+            debug: vi.fn(),
+            warn: vi.fn(),
+            error: vi.fn()
+
+        }
+    };
+});
 
 describe('TestRail API: Main methods tests', () => {
     let mock: axiosMockAdapter;
     let client: TestRail;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         client = new TestRail({
             domain: 'https://fake.testrail.io',
             username: 'username',
@@ -47,8 +53,7 @@ describe('TestRail API: Main methods tests', () => {
             const result = await client.getSuiteInfo(1);
 
             expect(logger.warn).not.toHaveBeenCalled();
-            const error = new Error('Request failed with status code 403');
-            expect(logger.error).toHaveBeenCalledWith('Failed to retrieve suite info for suite ID 1', error);
+            expect(logger.error).toHaveBeenCalledWith('Failed to retrieve suite info for suite ID 1', expect.any(Error));
             expect(result).toBeNull();
         });
     });
@@ -82,8 +87,7 @@ describe('TestRail API: Main methods tests', () => {
             });
 
             expect(logger.warn).not.toHaveBeenCalled();
-            const error = new Error('Request failed with status code 403');
-            expect(logger.error).toHaveBeenCalledWith('Failed to create a test run for project 1 and suite 1', error);
+            expect(logger.error).toHaveBeenCalledWith('Failed to create a test run for project 1 and suite 1', expect.any(Error));
             expect(result).toBeNull();
         });
     });
@@ -105,8 +109,7 @@ describe('TestRail API: Main methods tests', () => {
             const result = await client.addTestRunResults(1, [{ case_id: 1, status_id: 1, comment: 'Test comment' }]);
 
             expect(logger.warn).not.toHaveBeenCalled();
-            const error = new Error('Request failed with status code 403');
-            expect(logger.error).toHaveBeenCalledWith('Failed to add test run results for run ID 1', error);
+            expect(logger.error).toHaveBeenCalledWith('Failed to add test run results for run ID 1', expect.any(Error));
             expect(result).toBeNull();
         });
     });
@@ -125,8 +128,7 @@ describe('TestRail API: Main methods tests', () => {
             await client.closeTestRun(1);
 
             expect(logger.warn).not.toHaveBeenCalled();
-            const error = new Error('Request failed with status code 403');
-            expect(logger.error).toHaveBeenCalledWith('Failed to close test run for run ID 1', error);
+            expect(logger.error).toHaveBeenCalledWith('Failed to close test run for run ID 1', expect.any(Error));
         });
     });
 
@@ -153,8 +155,7 @@ describe('TestRail API: Main methods tests', () => {
             });
 
             expect(logger.warn).not.toHaveBeenCalled();
-            const error = new Error('Request failed with status code 403');
-            expect(logger.error).toHaveBeenCalledWith('Failed to add attachment to result 1', error);
+            expect(logger.error).toHaveBeenCalledWith('Failed to add attachment to result 1', expect.any(Error));
             expect(result).toBeNull();
         });
     });

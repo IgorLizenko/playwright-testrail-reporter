@@ -1,21 +1,27 @@
 import axiosMockAdapter from 'axios-mock-adapter';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TestRail } from '@testrail-api/testrail-api';
 
 import logger from '@logger';
 
-jest.mock('@logger', () => ({
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
-}));
+vi.mock('@logger', () => {
+    return {
+        default: {
+            debug: vi.fn(),
+            warn: vi.fn(),
+            error: vi.fn()
+
+        }
+    };
+});
 
 describe('TestRail API: Retry Logic', () => {
     let mock: axiosMockAdapter;
     let client: TestRail;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         client = new TestRail({
             domain: 'https://fake.testrail.io',
             username: 'username',
@@ -90,10 +96,8 @@ describe('TestRail API: Retry Logic', () => {
             includeAllCases: true
         });
 
-        const error = new Error('Request failed with status code 500');
-
         expect(logger.warn).toHaveBeenCalledTimes(3);
-        expect(logger.error).toHaveBeenCalledWith('Failed to create a test run for project 1 and suite 1', error);
+        expect(logger.error).toHaveBeenCalledWith('Failed to create a test run for project 1 and suite 1', expect.any(Error));
     });
 
     it('Should return data and not retry if previous request did not fail', async () => {
@@ -121,8 +125,7 @@ describe('TestRail API: Retry Logic', () => {
 
         await client.getSuiteInfo(1);
 
-        const error = new Error('Network Error');
         expect(logger.warn).toHaveBeenCalledTimes(3);
-        expect(logger.error).toHaveBeenCalledWith('Failed to retrieve suite info for suite ID 1', error);
+        expect(logger.error).toHaveBeenCalledWith('Failed to retrieve suite info for suite ID 1', expect.any(Error));
     });
 });

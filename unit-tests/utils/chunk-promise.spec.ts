@@ -1,14 +1,21 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { resolvePromisesInChunks } from '@reporter/utils/chunk-promise';
 
 import logger from '@logger';
 
-jest.mock('@logger', () => ({
-    debug: jest.fn()
-}));
+vi.mock('@logger', () => {
+    return {
+        default: {
+            debug: vi.fn()
+
+        }
+    };
+});
 
 describe('Resolve promises in chunks', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('Should return array of resolved promises', async () => {

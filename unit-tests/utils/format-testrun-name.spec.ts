@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { formatTestRunName } from '@reporter/utils/format-run-name';
 
 describe('Format test run name', () => {
