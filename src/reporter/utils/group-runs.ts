@@ -6,7 +6,8 @@ import logger from '@logger';
 
 /**
  * Groups test results by test runs based on case IDs.
- * @param runsCreated Array of runs with their case IDs
+ * @param arrayTestResults Array of TestRail run results
+ * @param arrayTestRuns Array of runs with their case IDs
  * @returns Array of final results grouped by runs
  */
 function groupTestResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
