@@ -5,6 +5,7 @@ import type {
 import { TestRail } from '@testrail-api/testrail-api';
 
 import { resolvePromisesInChunks } from '@reporter/utils/chunk-promise';
+import { filterOutEmptyRuns } from '@reporter/utils/filter-runs';
 import { formatTestRunName, TEMPLATE_DATE, TEMPLATE_SUITE } from '@reporter/utils/format-run-name';
 import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 import { parseArrayOfTags } from '@reporter/utils/tags';
@@ -12,7 +13,6 @@ import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-r
 import { validateSettings } from '@reporter/utils/validate-settings';
 
 import type { AttachmentData, CaseResultMatch, FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated } from '@types-internal/playwright-reporter.types';
-import { TestRailCaseStatus } from '@types-internal/testrail-api.types';
 import type { TestRailBaseSuite, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -85,7 +85,7 @@ class TestRailReporter implements Reporter {
             return;
         }
 
-        this.arrayTestRuns = this.filterOutEmptyRuns(this.arrayTestRuns!, this.arrayTestResults);
+        this.arrayTestRuns = filterOutEmptyRuns(this.arrayTestRuns!, this.arrayTestResults);
         if (this.arrayTestRuns.length === 0) {
             logger.warn('No runs to create after filtering out runs where all tests are skipped or have no results');
             return;
@@ -147,28 +147,6 @@ class TestRailReporter implements Reporter {
         return this.runNameTemplate.includes(TEMPLATE_SUITE) && suiteId !== null
             ? (await this.testRailClient.getSuiteInfo(suiteId))?.name
             : undefined;
-    }
-
-    private filterOutEmptyRuns(arrayTestRuns: ProjectSuiteCombo[], arrayTestResults: TestRailPayloadUpdateRunResult[]): ProjectSuiteCombo[] {
-        const filteredOutTestRuns = arrayTestRuns.filter((run) => {
-            const resultsForRun = arrayTestResults.filter((result) => run.arrayCaseIds.includes(result.case_id));
-
-            if (resultsForRun.length === 0) {
-                return false;
-            }
-
-            const hasNonSkippedResult = resultsForRun.some((result) => result.status_id !== TestRailCaseStatus.blocked);
-
-            return hasNonSkippedResult;
-        });
-
-        logger.debug(`Run filtration done, initial runs: ${arrayTestRuns.length}, filtered runs: ${filteredOutTestRuns.length}`);
-
-        if (filteredOutTestRuns.length !== arrayTestRuns.length) {
-            logger.warn(`Filtered out ${arrayTestRuns.length - filteredOutTestRuns.length} empty test runs`);
-        }
-
-        return filteredOutTestRuns;
     }
 
     private async createTestRuns(arrayTestRuns: ProjectSuiteCombo[]): Promise<RunCreated[]> {
