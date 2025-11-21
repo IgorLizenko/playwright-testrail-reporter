@@ -107,4 +107,9 @@ function groupAttachments(arrayAttachments: AttachmentData[], arrayCaseResults: 
     return mappedAttachments;
 }
 
-export { groupTestResults, filterDuplicatingCases, groupAttachments };
+function compileFinalResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
+    const arrayAllResults = groupTestResults(arrayTestResults, arrayTestRuns);
+    return arrayAllResults.map((finalResult) => filterDuplicatingCases(finalResult));
+}
+
+export { groupTestResults, filterDuplicatingCases, groupAttachments, compileFinalResults };

@@ -7,7 +7,7 @@ import { TestRail } from '@testrail-api/testrail-api';
 import { resolvePromisesInChunks } from '@reporter/utils/chunk-promise';
 import { filterOutEmptyRuns } from '@reporter/utils/filter-runs';
 import { formatTestRunName, TEMPLATE_DATE, TEMPLATE_SUITE } from '@reporter/utils/format-run-name';
-import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
+import { compileFinalResults, groupAttachments } from '@reporter/utils/group-runs';
 import { parseArrayOfTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
@@ -93,7 +93,7 @@ class TestRailReporter implements Reporter {
 
         const arrayTestRunsCreated = await this.createTestRuns(this.arrayTestRuns);
 
-        const finalResults = this.compileFinalResults(this.arrayTestResults, arrayTestRunsCreated);
+        const finalResults = compileFinalResults(this.arrayTestResults, arrayTestRunsCreated);
         logger.debug('Test runs to update', finalResults);
 
         if (finalResults.length === 0) {
@@ -182,11 +182,6 @@ class TestRailReporter implements Reporter {
         logger.debug('Runs created', results);
 
         return results;
-    }
-
-    private compileFinalResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
-        const arrayAllResults = groupTestResults(arrayTestResults, arrayTestRuns);
-        return arrayAllResults.map((finalResult) => filterDuplicatingCases(finalResult));
     }
 
     private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<CaseResultMatch[]> {

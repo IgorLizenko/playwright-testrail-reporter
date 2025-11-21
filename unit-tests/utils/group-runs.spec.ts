@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
+import { compileFinalResults, filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
 
 import type { AttachmentData, CaseResultMatch, FinalResult, RunCreated } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseStatus, type TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
@@ -296,6 +296,48 @@ describe('Group runs unit tests', () => {
             ];
 
             expect(groupAttachments(attachments, testResults)).toEqual(expected);
+        });
+    });
+
+    describe('Compile final results', () => {
+        it('Should compile final results for a complicated case', () => {
+            const arrayTestResults: TestRailPayloadUpdateRunResult[] = [
+                { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
+                { case_id: 1, status_id: TestRailCaseStatus.failed, comment: 'Test 1' },
+                { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' },
+                { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3' },
+                { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4' },
+                { case_id: 5, status_id: TestRailCaseStatus.passed, comment: 'Test 5' },
+                { case_id: 6, status_id: TestRailCaseStatus.failed, comment: 'Test 6' },
+                { case_id: 7, status_id: TestRailCaseStatus.blocked, comment: 'Test 7' },
+                { case_id: 8, status_id: TestRailCaseStatus.untested, comment: 'Test 8' }
+            ];
+
+            const arrayTestRuns: RunCreated[] = [
+                { projectId: 10, suiteId: 100, runId: 1000, arrayCaseIds: [1, 2, 3, 4] },
+                { projectId: 10, suiteId: 100, runId: 1001, arrayCaseIds: [5, 6, 7, 8] }
+            ];
+
+            expect(compileFinalResults(arrayTestResults, arrayTestRuns)).toEqual([
+                {
+                    runId: 1000,
+                    arrayCaseResults: [
+                        { case_id: 1, status_id: TestRailCaseStatus.passed, comment: 'Test 1' },
+                        { case_id: 2, status_id: TestRailCaseStatus.failed, comment: 'Test 2' },
+                        { case_id: 3, status_id: TestRailCaseStatus.blocked, comment: 'Test 3' },
+                        { case_id: 4, status_id: TestRailCaseStatus.untested, comment: 'Test 4' }
+                    ]
+                },
+                {
+                    runId: 1001,
+                    arrayCaseResults: [
+                        { case_id: 5, status_id: TestRailCaseStatus.passed, comment: 'Test 5' },
+                        { case_id: 6, status_id: TestRailCaseStatus.failed, comment: 'Test 6' },
+                        { case_id: 7, status_id: TestRailCaseStatus.blocked, comment: 'Test 7' },
+                        { case_id: 8, status_id: TestRailCaseStatus.untested, comment: 'Test 8' }
+                    ]
+                }
+            ]);
         });
     });
 });
