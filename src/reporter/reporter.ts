@@ -5,8 +5,9 @@ import type {
 import { TestRail } from '@testrail-api/testrail-api';
 
 import { resolvePromisesInChunks } from '@reporter/utils/chunk-promise';
+import { filterOutEmptyRuns } from '@reporter/utils/filter-runs';
 import { formatTestRunName, TEMPLATE_DATE, TEMPLATE_SUITE } from '@reporter/utils/format-run-name';
-import { filterDuplicatingCases, groupAttachments, groupTestResults } from '@reporter/utils/group-runs';
+import { compileFinalResults, groupAttachments } from '@reporter/utils/group-runs';
 import { parseArrayOfTags } from '@reporter/utils/tags';
 import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-results';
 import { validateSettings } from '@reporter/utils/validate-settings';
@@ -28,6 +29,7 @@ class TestRailReporter implements Reporter {
     private readonly includeAllCases: boolean;
     private readonly includeAttachments: boolean;
     private readonly closeRuns: boolean;
+    private readonly createEmptyRuns: boolean;
     private readonly chunkSize: number;
     private readonly runNameTemplate: string;
 
@@ -35,6 +37,7 @@ class TestRailReporter implements Reporter {
         includeAllCases: false,
         includeAttachments: false,
         closeRuns: false,
+        createEmptyRuns: false,
         apiChunkSize: 10,
         runNameTemplate: `Playwright Run ${TEMPLATE_DATE}`
     };
@@ -52,6 +55,7 @@ class TestRailReporter implements Reporter {
         this.includeAllCases = options.includeAllCases ?? this.defaultSettings.includeAllCases;
         this.includeAttachments = options.includeAttachments ?? this.defaultSettings.includeAttachments;
         this.closeRuns = options.closeRuns ?? this.defaultSettings.closeRuns;
+        this.createEmptyRuns = options.createEmptyRuns ?? this.defaultSettings.createEmptyRuns;
         this.chunkSize = options.apiChunkSize ?? this.defaultSettings.apiChunkSize;
         this.runNameTemplate = options.runNameTemplate ?? this.defaultSettings.runNameTemplate;
 
@@ -59,6 +63,7 @@ class TestRailReporter implements Reporter {
             includeAllCases: this.includeAllCases,
             includeAttachments: this.includeAttachments,
             closeRuns: this.closeRuns,
+            createEmptyRuns: this.createEmptyRuns,
             chunkSize: this.chunkSize,
             runNameTemplate: this.runNameTemplate
         });
@@ -66,7 +71,7 @@ class TestRailReporter implements Reporter {
 
     onBegin(_config: FullConfig, suite: Suite): void {
         this.arrayTestRuns = parseArrayOfTags(suite.allTests().map((test) => test.tags).flat());
-        logger.debug('Runs to create', this.arrayTestRuns);
+        logger.debug('Runs to create (Initial)', this.arrayTestRuns);
 
         if (!this.arrayTestRuns) {
             logger.warn('No tags in expected format found, no test runs will be created');
@@ -84,9 +89,17 @@ class TestRailReporter implements Reporter {
             return;
         }
 
+        if (!this.createEmptyRuns) {
+            this.arrayTestRuns = filterOutEmptyRuns(this.arrayTestRuns!, this.arrayTestResults);
+            if (this.arrayTestRuns.length === 0) {
+                logger.warn('No runs to create after filtering out runs where all tests are skipped or have no results');
+                return;
+            }
+        }
+
         const arrayTestRunsCreated = await this.createTestRuns(this.arrayTestRuns!);
 
-        const finalResults = this.compileFinalResults(this.arrayTestResults, arrayTestRunsCreated);
+        const finalResults = compileFinalResults(this.arrayTestResults, arrayTestRunsCreated);
         logger.debug('Test runs to update', finalResults);
 
         if (finalResults.length === 0) {
@@ -143,7 +156,7 @@ class TestRailReporter implements Reporter {
     }
 
     private async createTestRuns(arrayTestRuns: ProjectSuiteCombo[]): Promise<RunCreated[]> {
-        logger.debug('Runs to create', arrayTestRuns);
+        logger.debug('Runs to create (Final)', arrayTestRuns);
 
         const results = await resolvePromisesInChunks({
             arrayInputData: arrayTestRuns,
@@ -175,11 +188,6 @@ class TestRailReporter implements Reporter {
         logger.debug('Runs created', results);
 
         return results;
-    }
-
-    private compileFinalResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
-        const arrayAllResults = groupTestResults(arrayTestResults, arrayTestRuns);
-        return arrayAllResults.map((finalResult) => filterDuplicatingCases(finalResult));
     }
 
     private async addResultsToRuns(arrayTestRuns: FinalResult[]): Promise<CaseResultMatch[]> {

@@ -6,7 +6,8 @@ import logger from '@logger';
 
 /**
  * Groups test results by test runs based on case IDs.
- * @param runsCreated Array of runs with their case IDs
+ * @param arrayTestResults Array of TestRail run results
+ * @param arrayTestRuns Array of runs with their case IDs
  * @returns Array of final results grouped by runs
  */
 function groupTestResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
@@ -106,4 +107,9 @@ function groupAttachments(arrayAttachments: AttachmentData[], arrayCaseResults: 
     return mappedAttachments;
 }
 
-export { groupTestResults, filterDuplicatingCases, groupAttachments };
+function compileFinalResults(arrayTestResults: TestRailPayloadUpdateRunResult[], arrayTestRuns: RunCreated[]): FinalResult[] {
+    const arrayAllResults = groupTestResults(arrayTestResults, arrayTestRuns);
+    return arrayAllResults.map((finalResult) => filterDuplicatingCases(finalResult));
+}
+
+export { groupTestResults, filterDuplicatingCases, groupAttachments, compileFinalResults };
