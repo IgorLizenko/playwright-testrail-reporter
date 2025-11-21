@@ -12,6 +12,7 @@ import { convertTestResult, extractAttachmentData } from '@reporter/utils/test-r
 import { validateSettings } from '@reporter/utils/validate-settings';
 
 import type { AttachmentData, CaseResultMatch, FinalResult, ProjectSuiteCombo, ReporterOptions, RunCreated } from '@types-internal/playwright-reporter.types';
+import { TestRailCaseStatus } from '@types-internal/testrail-api.types';
 import type { TestRailBaseSuite, TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -66,7 +67,7 @@ class TestRailReporter implements Reporter {
 
     onBegin(_config: FullConfig, suite: Suite): void {
         this.arrayTestRuns = parseArrayOfTags(suite.allTests().map((test) => test.tags).flat());
-        logger.debug('Runs to create', this.arrayTestRuns);
+        logger.debug('Runs to create (Initial)', this.arrayTestRuns);
 
         if (!this.arrayTestRuns) {
             logger.warn('No tags in expected format found, no test runs will be created');
@@ -84,7 +85,13 @@ class TestRailReporter implements Reporter {
             return;
         }
 
-        const arrayTestRunsCreated = await this.createTestRuns(this.arrayTestRuns!);
+        this.arrayTestRuns = this.filterOutEmptyRuns(this.arrayTestRuns!, this.arrayTestResults);
+        if (this.arrayTestRuns.length === 0) {
+            logger.warn('No runs to create after filtering out runs where all tests are skipped or have no results');
+            return;
+        }
+
+        const arrayTestRunsCreated = await this.createTestRuns(this.arrayTestRuns);
 
         const finalResults = this.compileFinalResults(this.arrayTestResults, arrayTestRunsCreated);
         logger.debug('Test runs to update', finalResults);
@@ -142,8 +149,30 @@ class TestRailReporter implements Reporter {
             : undefined;
     }
 
+    private filterOutEmptyRuns(arrayTestRuns: ProjectSuiteCombo[], arrayTestResults: TestRailPayloadUpdateRunResult[]): ProjectSuiteCombo[] {
+        const filteredOutTestRuns = arrayTestRuns.filter((run) => {
+            const resultsForRun = arrayTestResults.filter((result) => run.arrayCaseIds.includes(result.case_id));
+
+            if (resultsForRun.length === 0) {
+                return false;
+            }
+
+            const hasNonSkippedResult = resultsForRun.some((result) => result.status_id !== TestRailCaseStatus.blocked);
+
+            return hasNonSkippedResult;
+        });
+
+        logger.debug(`Run filtration done, initial runs: ${arrayTestRuns.length}, filtered runs: ${filteredOutTestRuns.length}`);
+
+        if (filteredOutTestRuns.length !== arrayTestRuns.length) {
+            logger.warn(`Filtered out ${arrayTestRuns.length - filteredOutTestRuns.length} empty test runs`);
+        }
+
+        return filteredOutTestRuns;
+    }
+
     private async createTestRuns(arrayTestRuns: ProjectSuiteCombo[]): Promise<RunCreated[]> {
-        logger.debug('Runs to create', arrayTestRuns);
+        logger.debug('Runs to create (Final)', arrayTestRuns);
 
         const results = await resolvePromisesInChunks({
             arrayInputData: arrayTestRuns,
