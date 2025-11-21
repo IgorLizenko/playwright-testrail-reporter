@@ -27,19 +27,13 @@ export function validateSettings(options: ReporterOptions): boolean {
         return false;
     }
 
-    if ('closeRuns' in options && typeof options.closeRuns !== 'boolean') {
-        logger.error('closeRuns must be a boolean');
-        return false;
-    }
+    const arrayBooleanOptions: (keyof ReporterOptions)[] = ['closeRuns', 'createEmptyRuns', 'includeAllCases', 'includeAttachments'];
 
-    if ('includeAllCases' in options && typeof options.includeAllCases !== 'boolean') {
-        logger.error('includeAllCases must be a boolean');
-        return false;
-    }
-
-    if ('includeAttachments' in options && typeof options.includeAttachments !== 'boolean') {
-        logger.error('includeAttachments must be a boolean');
-        return false;
+    for (const option of arrayBooleanOptions) {
+        if (option in options && typeof options[option] !== 'boolean') {
+            logger.error(`${option} must be a boolean`);
+            return false;
+        }
     }
 
     if ('runNameTemplate' in options && typeof options.runNameTemplate !== 'string') {

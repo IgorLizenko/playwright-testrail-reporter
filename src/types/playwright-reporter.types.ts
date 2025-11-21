@@ -7,6 +7,7 @@ export type ReporterOptions = {
     includeAllCases?: boolean,
     includeAttachments?: boolean,
     closeRuns?: boolean,
+    createEmptyRuns?: boolean,
     apiChunkSize?: number,
     runNameTemplate?: string
 };

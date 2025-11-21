@@ -29,6 +29,7 @@ class TestRailReporter implements Reporter {
     private readonly includeAllCases: boolean;
     private readonly includeAttachments: boolean;
     private readonly closeRuns: boolean;
+    private readonly createEmptyRuns: boolean;
     private readonly chunkSize: number;
     private readonly runNameTemplate: string;
 
@@ -36,6 +37,7 @@ class TestRailReporter implements Reporter {
         includeAllCases: false,
         includeAttachments: false,
         closeRuns: false,
+        createEmptyRuns: false,
         apiChunkSize: 10,
         runNameTemplate: `Playwright Run ${TEMPLATE_DATE}`
     };
@@ -53,6 +55,7 @@ class TestRailReporter implements Reporter {
         this.includeAllCases = options.includeAllCases ?? this.defaultSettings.includeAllCases;
         this.includeAttachments = options.includeAttachments ?? this.defaultSettings.includeAttachments;
         this.closeRuns = options.closeRuns ?? this.defaultSettings.closeRuns;
+        this.createEmptyRuns = options.createEmptyRuns ?? this.defaultSettings.createEmptyRuns;
         this.chunkSize = options.apiChunkSize ?? this.defaultSettings.apiChunkSize;
         this.runNameTemplate = options.runNameTemplate ?? this.defaultSettings.runNameTemplate;
 
@@ -60,6 +63,7 @@ class TestRailReporter implements Reporter {
             includeAllCases: this.includeAllCases,
             includeAttachments: this.includeAttachments,
             closeRuns: this.closeRuns,
+            createEmptyRuns: this.createEmptyRuns,
             chunkSize: this.chunkSize,
             runNameTemplate: this.runNameTemplate
         });
@@ -85,13 +89,15 @@ class TestRailReporter implements Reporter {
             return;
         }
 
-        this.arrayTestRuns = filterOutEmptyRuns(this.arrayTestRuns!, this.arrayTestResults);
-        if (this.arrayTestRuns.length === 0) {
-            logger.warn('No runs to create after filtering out runs where all tests are skipped or have no results');
-            return;
+        if (!this.createEmptyRuns) {
+            this.arrayTestRuns = filterOutEmptyRuns(this.arrayTestRuns!, this.arrayTestResults);
+            if (this.arrayTestRuns.length === 0) {
+                logger.warn('No runs to create after filtering out runs where all tests are skipped or have no results');
+                return;
+            }
         }
 
-        const arrayTestRunsCreated = await this.createTestRuns(this.arrayTestRuns);
+        const arrayTestRunsCreated = await this.createTestRuns(this.arrayTestRuns!);
 
         const finalResults = compileFinalResults(this.arrayTestResults, arrayTestRunsCreated);
         logger.debug('Test runs to update', finalResults);
