@@ -56,8 +56,12 @@ function compareByStatusPriority(a: TestRailPayloadUpdateRunResult, b: TestRailP
 function filterDuplicatingCases(singleResult: FinalResult): FinalResult {
     const caseResultsMap = new Map<number, TestRailPayloadUpdateRunResult[]>();
     for (const result of singleResult.arrayCaseResults) {
-        const existing = caseResultsMap.get(result.case_id) ?? [];
-        caseResultsMap.set(result.case_id, [...existing, result]);
+        const existing = caseResultsMap.get(result.case_id);
+        if (!existing) {
+            caseResultsMap.set(result.case_id, [result]);
+        } else {
+            existing.push(result);
+        }
     }
 
     const filteredResults: TestRailPayloadUpdateRunResult[] = [];
