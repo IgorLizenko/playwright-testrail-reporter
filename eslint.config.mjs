@@ -14,7 +14,6 @@ export default [
   {
     languageOptions: {
       parserOptions: {
-          project: "./tsconfig.json",
             projectService: true,
             allowDefaultProject: true
       }
