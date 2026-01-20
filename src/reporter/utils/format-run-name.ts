@@ -1,21 +1,21 @@
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZone: 'UTC',
+    hour12: false
+});
 
 /**
- * Formats the current date and time in UTC using the format YYYY/MM/DD HH:mm:ss UTC
+ * Formats a date and time in UTC using the format YYYY/MM/DD HH:mm:ss UTC
+ * @param {Date} date - The date to format
  * @returns {string} Formatted date string
  */
-function formatDate(): string {
-    const date = new Date();
-    const formatter = new Intl.DateTimeFormat('en-GB', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        timeZone: 'UTC',
-        hour12: false
-    });
-    const parts = formatter.formatToParts(date);
+function formatDate(date: Date): string {
+    const parts = DATE_FORMATTER.formatToParts(date);
     const values = parts.reduce<Record<string, string>>((acc, part) => {
         acc[part.type] = part.value;
         return acc;
@@ -38,10 +38,11 @@ export const TEMPLATE_SUITE = '#{suite}';
  * @returns {string} Formatted test run name with replaced placeholders
  */
 export function formatTestRunName(template: string, suiteName?: string): string {
+    const now = new Date();
     let result = template;
 
-    result = result.replaceAll(TEMPLATE_DATE, formatDate());
-    result = result.replaceAll(TEMPLATE_TIMESTAMP, Date.now().toString());
+    result = result.replaceAll(TEMPLATE_DATE, formatDate(now));
+    result = result.replaceAll(TEMPLATE_TIMESTAMP, now.getTime().toString());
     result = result.replaceAll(TEMPLATE_SUITE, suiteName ?? 'All Tests');
 
     return result;
