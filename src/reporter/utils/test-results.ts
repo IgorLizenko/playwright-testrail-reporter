@@ -214,7 +214,7 @@ function convertTestResult({
 
     let arrayTestResults: TestRailPayloadUpdateRunResult[] = [];
 
-    if (parsedTags) {
+    if (parsedTags.length > 0) {
         arrayTestResults = parsedTags.map((tag) => (
             tag.arrayCaseIds.map((caseId) => ({
                 case_id: caseId,
