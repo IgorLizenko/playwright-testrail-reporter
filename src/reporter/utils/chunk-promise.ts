@@ -25,11 +25,11 @@ export async function resolvePromisesInChunks<T, R>({
 }): Promise<R[]> {
     const results: R[] = [];
 
-    const quantityOfChunks = Math.ceil(arrayInputData.length / chunkSize);
+    const totalChunks = Math.ceil(arrayInputData.length / chunkSize);
 
-    for (let i = 0; i < quantityOfChunks; i++) {
+    for (let i = 0; i < totalChunks; i++) {
         const chunk = arrayInputData.slice(i * chunkSize, (i + 1) * chunkSize);
-        logger.debug(`Processing chunk ${i + 1} of ${quantityOfChunks}`);
+        logger.debug(`Processing chunk ${i + 1} of ${totalChunks}`);
         const chunkResults = (await Promise.all(chunk.map((input) => functionToCall(input))))
             .filter((result) => result !== null);
         results.push(...chunkResults);
