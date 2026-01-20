@@ -4,7 +4,7 @@ import type { TestCase, TestError, TestResult, TestStep } from '@playwright/test
 
 import { parseArrayOfTags, parseSingleTag, REGEX_TAG_STEP } from '@reporter/utils/tags';
 
-import type { AttachmentData } from '@types-internal/playwright-reporter.types';
+import type { AttachmentData, ParsedTag } from '@types-internal/playwright-reporter.types';
 import { TestRailCaseStatus, type TestRailPayloadUpdateRunResult } from '@types-internal/testrail-api.types';
 
 import logger from '@logger';
@@ -215,14 +215,14 @@ function convertTestResult({
     let arrayTestResults: TestRailPayloadUpdateRunResult[] = [];
 
     if (parsedTags.length > 0) {
-        arrayTestResults = parsedTags.map((tag) => (
+        arrayTestResults = parsedTags.flatMap((tag) =>
             tag.arrayCaseIds.map((caseId) => ({
                 case_id: caseId,
                 status_id: convertTestStatus(testResult.status),
                 comment: generateTestComment(testCase, testResult),
                 elapsed: formatMilliseconds(testResult.duration)
             }))
-        )).flat();
+        );
 
         const arrayTaggedSteps = testResult.steps
             .filter((step) => step.category === 'test.step' && step.title.match(REGEX_TAG_STEP));
@@ -261,7 +261,7 @@ function extractAttachmentData({
 
     const arrayParsedValidTags = testCase.tags
         .map((tag) => parseSingleTag(tag))
-        .filter((parsedTag) => parsedTag !== null);
+        .filter((parsedTag): parsedTag is ParsedTag => parsedTag !== null);
 
     if (arrayParsedValidTags.length === 0) {
         return [];
@@ -274,7 +274,7 @@ function extractAttachmentData({
                 .filter((attachment) => attachment.path)
                 .map((attachment) => attachment.path!)
         };
-    }).flat();
+    });
 }
 
 export { convertTestStatus, generateTestComment, convertTestResult, extractAttachmentData };
