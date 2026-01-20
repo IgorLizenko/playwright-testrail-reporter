@@ -69,7 +69,7 @@ describe('Validate settings tests', () => {
             username: 'username'
         } as ReporterOptions);
 
-        expect(logger.error).toHaveBeenCalledWith('Missing required credentials: domain, password');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- domain is required and must be a non-empty string\n- password is required and must be a non-empty string');
     });
 
     it('Should return false if fields have incorrect types', () => {
@@ -91,7 +91,7 @@ describe('Validate settings tests', () => {
         } as unknown as ReporterOptions;
 
         const result = validateSettings(settings);
-        expect(logger.error).toHaveBeenCalledWith('apiChunkSize must be an integer greater than 0');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- apiChunkSize must be an integer greater than 0');
         expect(result).toBe(false);
     });
 
@@ -104,7 +104,7 @@ describe('Validate settings tests', () => {
         } as unknown as ReporterOptions;
 
         const result = validateSettings(settings);
-        expect(logger.error).toHaveBeenCalledWith('apiChunkSize must be an integer greater than 0');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- apiChunkSize must be an integer greater than 0');
         expect(result).toBe(false);
     });
 
@@ -117,7 +117,7 @@ describe('Validate settings tests', () => {
         } as unknown as ReporterOptions;
 
         const result = validateSettings(settings);
-        expect(logger.error).toHaveBeenCalledWith('apiChunkSize must be an integer greater than 0');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- apiChunkSize must be an integer greater than 0');
         expect(result).toBe(false);
     });
 
@@ -130,7 +130,7 @@ describe('Validate settings tests', () => {
         } as unknown as ReporterOptions;
 
         const result = validateSettings(settings);
-        expect(logger.error).toHaveBeenCalledWith('apiChunkSize must be an integer greater than 0');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- apiChunkSize must be an integer greater than 0');
         expect(result).toBe(false);
     });
 
@@ -143,7 +143,7 @@ describe('Validate settings tests', () => {
         } as unknown as ReporterOptions;
 
         const result = validateSettings(settings);
-        expect(logger.error).toHaveBeenCalledWith('closeRuns must be a boolean');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- closeRuns must be a boolean');
         expect(result).toBe(false);
     });
 
@@ -156,7 +156,7 @@ describe('Validate settings tests', () => {
         } as unknown as ReporterOptions;
 
         const result = validateSettings(settings);
-        expect(logger.error).toHaveBeenCalledWith('includeAllCases must be a boolean');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- includeAllCases must be a boolean');
         expect(result).toBe(false);
     });
 
@@ -169,7 +169,7 @@ describe('Validate settings tests', () => {
         } as unknown as ReporterOptions;
 
         const result = validateSettings(settings);
-        expect(logger.error).toHaveBeenCalledWith('includeAttachments must be a boolean');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- includeAttachments must be a boolean');
         expect(result).toBe(false);
     });
 
@@ -182,7 +182,7 @@ describe('Validate settings tests', () => {
         } as unknown as ReporterOptions;
 
         const result = validateSettings(settings);
-        expect(logger.error).toHaveBeenCalledWith('runNameTemplate must be a string');
+        expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- runNameTemplate must be a string');
         expect(result).toBe(false);
     });
 });
