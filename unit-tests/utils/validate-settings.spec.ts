@@ -54,6 +54,46 @@ describe('Validate settings tests', () => {
         })).toBe(false);
     });
 
+    it('Should return false if username is set to an empty string', () => {
+        expect(validateSettings({
+            domain: 'https://testrail.com',
+            username: '',
+            password: 'password'
+        })).toBe(false);
+    });
+
+    it('Should return false if password is set to an empty string', () => {
+        expect(validateSettings({
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: ''
+        })).toBe(false);
+    });
+
+    it('Should return false if domain is whitespace only', () => {
+        expect(validateSettings({
+            domain: '   ',
+            username: 'username',
+            password: 'password'
+        })).toBe(false);
+    });
+
+    it('Should return false if username is whitespace only', () => {
+        expect(validateSettings({
+            domain: 'https://testrail.com',
+            username: '   ',
+            password: 'password'
+        })).toBe(false);
+    });
+
+    it('Should return false if password is whitespace only', () => {
+        expect(validateSettings({
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: '   '
+        })).toBe(false);
+    });
+
     it('Should return false if multiple settings are missing', () => {
         expect(validateSettings({
             username: 'username'
@@ -183,6 +223,65 @@ describe('Validate settings tests', () => {
 
         const result = validateSettings(settings);
         expect(logger.error).toHaveBeenCalledWith('Settings validation failed:\n- runNameTemplate must be a string');
+        expect(result).toBe(false);
+    });
+
+    it('Should collect and report multiple validation errors at once', () => {
+        const settings = {
+            domain: '',
+            username: 'username',
+            password: '',
+            apiChunkSize: 0,
+            closeRuns: 'true'
+        } as unknown as ReporterOptions;
+
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith(
+            'Settings validation failed:\n- domain is required and must be a non-empty string\n- password is required and must be a non-empty string\n- apiChunkSize must be an integer greater than 0\n- closeRuns must be a boolean'
+        );
+        expect(result).toBe(false);
+    });
+
+    it('Should report all credential errors when all are missing', () => {
+        const settings = {} as ReporterOptions;
+
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith(
+            'Settings validation failed:\n- domain is required and must be a non-empty string\n- username is required and must be a non-empty string\n- password is required and must be a non-empty string'
+        );
+        expect(result).toBe(false);
+    });
+
+    it('Should report all boolean option errors when multiple are invalid', () => {
+        const settings = {
+            domain: 'https://testrail.com',
+            username: 'username',
+            password: 'password',
+            closeRuns: 'true',
+            includeAllCases: 1,
+            includeAttachments: null
+        } as unknown as ReporterOptions;
+
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith(
+            'Settings validation failed:\n- closeRuns must be a boolean\n- includeAllCases must be a boolean\n- includeAttachments must be a boolean'
+        );
+        expect(result).toBe(false);
+    });
+
+    it('Should report mixed credential and optional field errors', () => {
+        const settings = {
+            domain: '   ',
+            username: '',
+            password: 'password',
+            apiChunkSize: -5,
+            runNameTemplate: true
+        } as unknown as ReporterOptions;
+
+        const result = validateSettings(settings);
+        expect(logger.error).toHaveBeenCalledWith(
+            'Settings validation failed:\n- domain is required and must be a non-empty string\n- username is required and must be a non-empty string\n- apiChunkSize must be an integer greater than 0\n- runNameTemplate must be a string'
+        );
         expect(result).toBe(false);
     });
 });
