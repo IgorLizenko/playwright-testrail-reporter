@@ -144,8 +144,8 @@ describe('Playwright tags parsing', function () {
             ]);
         });
 
-        it('Should return null for an empty array', function () {
-            expect(parseArrayOfTags([])).toEqual(null);
+        it('Should return empty array for an empty array', function () {
+            expect(parseArrayOfTags([])).toEqual([]);
         });
     });
 });

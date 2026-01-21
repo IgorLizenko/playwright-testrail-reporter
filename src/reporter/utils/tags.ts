@@ -45,19 +45,22 @@ export function parseSingleTag(tag: TestCase['tags'][number]): ParsedTag | null 
 /**
  * Parses an array of TestRail tags and groups them by project and suite. Handles duplicate case IDs by including them only once.
  * @param tags - An array of tag strings from Playwright test case tags
- * @returns An array of ProjectSuiteCombo objects, each containing projectId, suiteId (nullable), and an array of unique caseIds
- *          if at least one tag matches the expected format, null otherwise
+ * @returns An array of ProjectSuiteCombo objects, each containing projectId, suiteId (nullable), and an array of unique caseIds.
+ *          Returns an empty array if no tags match the expected format.
  */
-export function parseArrayOfTags(tags: TestCase['tags']): ProjectSuiteCombo[] | null {
-    const arrayParsedValidTags = tags.map((tag) => parseSingleTag(tag)).filter((parsedTag) => parsedTag !== null);
+export function parseArrayOfTags(tags: TestCase['tags']): ProjectSuiteCombo[] {
+    const arrayParsedValidTags = tags
+        .map((tag) => parseSingleTag(tag))
+        .filter((parsedTag): parsedTag is ParsedTag => parsedTag !== null);
 
     if (arrayParsedValidTags.length === 0) {
-        return null;
+        return [];
     }
 
     const groupedResults = new Map<string, ProjectSuiteCombo>();
 
     for (const parsedTag of arrayParsedValidTags) {
+        // Group by "projectId-suiteId" or just "projectId" for suiteless projects
         const key = parsedTag.suiteId ? `${parsedTag.projectId}-${parsedTag.suiteId}` : `${parsedTag.projectId}`;
         const existingGroup = groupedResults.get(key);
 

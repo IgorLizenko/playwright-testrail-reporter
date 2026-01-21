@@ -73,7 +73,7 @@ class TestRailReporter implements Reporter {
         this.arrayTestRuns = parseArrayOfTags(suite.allTests().map((test) => test.tags).flat());
         logger.debug('Runs to create (Initial)', this.arrayTestRuns);
 
-        if (!this.arrayTestRuns) {
+        if (this.arrayTestRuns.length === 0) {
             logger.warn('No tags in expected format found, no test runs will be created');
         }
     }

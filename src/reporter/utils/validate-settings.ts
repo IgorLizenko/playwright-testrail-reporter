@@ -3,41 +3,38 @@ import type { ReporterOptions } from '@types-internal/playwright-reporter.types'
 import logger from '@logger';
 
 export function validateSettings(options: ReporterOptions): boolean {
-    const missingFields: string[] = [];
+    const errors: string[] = [];
 
-    if (!options.domain || typeof options.domain !== 'string') {
-        missingFields.push('domain');
+    if (typeof options.domain !== 'string' || options.domain.trim() === '') {
+        errors.push('domain is required and must be a non-empty string');
     }
 
-    if (!options.username || typeof options.username !== 'string') {
-        missingFields.push('username');
+    if (typeof options.username !== 'string' || options.username.trim() === '') {
+        errors.push('username is required and must be a non-empty string');
     }
 
-    if (!options.password || typeof options.password !== 'string') {
-        missingFields.push('password');
+    if (typeof options.password !== 'string' || options.password.trim() === '') {
+        errors.push('password is required and must be a non-empty string');
     }
 
-    if (missingFields.length > 0) {
-        logger.error(`Missing required credentials: ${missingFields.join(', ')}`);
-        return false;
-    }
-
-    if ('apiChunkSize' in options && (!Number.isInteger(options.apiChunkSize) || options.apiChunkSize! < 1)) {
-        logger.error('apiChunkSize must be an integer greater than 0');
-        return false;
+    if (options.apiChunkSize !== undefined && (!Number.isInteger(options.apiChunkSize) || options.apiChunkSize < 1)) {
+        errors.push('apiChunkSize must be an integer greater than 0');
     }
 
     const arrayBooleanOptions: (keyof ReporterOptions)[] = ['closeRuns', 'createEmptyRuns', 'includeAllCases', 'includeAttachments'];
 
     for (const option of arrayBooleanOptions) {
         if (option in options && typeof options[option] !== 'boolean') {
-            logger.error(`${option} must be a boolean`);
-            return false;
+            errors.push(`${option} must be a boolean`);
         }
     }
 
     if ('runNameTemplate' in options && typeof options.runNameTemplate !== 'string') {
-        logger.error('runNameTemplate must be a string');
+        errors.push('runNameTemplate must be a string');
+    }
+
+    if (errors.length > 0) {
+        logger.error(`Settings validation failed:\n- ${errors.join('\n- ')}`);
         return false;
     }
 
