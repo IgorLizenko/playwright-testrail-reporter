@@ -2,20 +2,24 @@ name: Publish NPM Package
 
 on:
   push:
-    branches: 
+    branches:
     - main
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4
+
       - name: Install NodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 24.3.0
-
-      - name: Code Checkout
-        uses: actions/checkout@v3
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install Dependencies
         run: npm ci
@@ -24,6 +28,4 @@ jobs:
         run: npm run build
 
       - name: Publish
-        uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
